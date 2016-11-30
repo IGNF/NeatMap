@@ -174,7 +174,10 @@ class TidyCity:
         
         self.dlg.fileLineEdit.clear()
         self.dlg.fileButton.clicked.connect(self.select_output_file)
-
+        self.save = self.dlg.saveCheckBox.isChecked()
+        self.load = self.dlg.loadCheckBox.isChecked()
+        self.dlg.saveCheckBox.clicked.connect(self.toggle_save)
+        self.dlg.loadCheckBox.clicked.connect(self.toggle_load)
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
@@ -189,7 +192,16 @@ class TidyCity:
     def select_output_file(self):
         filename = QFileDialog.getSaveFileName(self.dlg, "Select output file ","", '*.shp')
         self.dlg.fileLineEdit.setText(filename)
-    
+
+    def toggle_save(self):
+        self.save = self.dlg.saveCheckBox.isChecked()
+        self.dlg.fileLineEdit.setEnabled(self.save)
+        self.dlg.fileButton.setEnabled(self.save)
+
+    def toggle_load(self):
+        self.load = self.dlg.saveCheckBox.isChecked()
+        self.dlg.layerLineEdit.setEnabled(self.load)
+
     def compute_density(self, geom, area, index, filterLayer):
         intersectingfids = index.intersects(geom.boundingBox())
         geometries = []
@@ -230,6 +242,7 @@ class TidyCity:
         # See if OK was pressed
         if result:
             filename = self.dlg.fileLineEdit.text()
+            layername = self.dlg.layerLineEdit.text()
             threshold = self.dlg.thresholdDoubleSpinBox.value()
 
             selectedInputLayerIndex = self.dlg.inputLayerComboBox.currentIndex()
@@ -244,7 +257,7 @@ class TidyCity:
             print "Filter layer index created!"
                         
             # create layer
-            vl = QgsVectorLayer("Polygon", "new_polygons", "memory")
+            vl = QgsVectorLayer("Polygon", layername, "memory")
             pr = vl.dataProvider()
 
             # Enter editing mode
@@ -293,6 +306,8 @@ class TidyCity:
 
             # Commit changes
             vl.commitChanges()
-            error = QgsVectorFileWriter.writeAsVectorFormat(vl, filename, "UTF-8", None, "ESRI Shapefile")
-            QgsMapLayerRegistry.instance().addMapLayer(vl)
-            
+            if self.save:
+                error = QgsVectorFileWriter.writeAsVectorFormat(vl, filename, "UTF-8", None, "ESRI Shapefile")
+            if self.load:
+                QgsMapLayerRegistry.instance().addMapLayer(vl)
+
