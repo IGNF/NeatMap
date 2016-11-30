@@ -20,14 +20,18 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
-from PyQt4.QtGui import QAction, QIcon
+from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QVariant, Qt
+from PyQt4.QtGui import QAction, QIcon, QFileDialog, QProgressBar
 # Initialize Qt resources from file resources.py
 import resources
 # Import the code for the dialog
 from tidy_city_dialog import TidyCityDialog
 import os.path
-
+import math
+from qgis.core import QgsVectorLayer, QgsFeature, QgsSpatialIndex, QgsVectorFileWriter, QgsMapLayerRegistry
+from qgis.core import QgsFeatureRequest, QgsField, QgsGeometry 
+from shapely.wkb import loads
+from shapely.ops import cascaded_union, unary_union
 
 class TidyCity:
     """QGIS Plugin Implementation."""
@@ -167,6 +171,9 @@ class TidyCity:
             text=self.tr(u'Build a tidy city'),
             callback=self.run,
             parent=self.iface.mainWindow())
+        
+        self.dlg.fileLineEdit.clear()
+        self.dlg.fileButton.clicked.connect(self.select_output_file)
 
 
     def unload(self):
@@ -179,15 +186,113 @@ class TidyCity:
         # remove the toolbar
         del self.toolbar
 
+    def select_output_file(self):
+        filename = QFileDialog.getSaveFileName(self.dlg, "Select output file ","", '*.shp')
+        self.dlg.fileLineEdit.setText(filename)
+    
+    def compute_density(self, geom, area, index, filterLayer):
+        intersectingfids = index.intersects(geom.boundingBox())
+        geometries = []
+        for fid in intersectingfids:
+            intersecting_feat = filterLayer.getFeatures(QgsFeatureRequest(fid)).next()
+            if intersecting_feat.geometry().intersects(geom):
+                geometries.append(intersecting_feat.geometry().intersection(geom))
+        if geometries:
+            union_geoms = QgsGeometry.unaryUnion(geometries)
+            total_intersecting_area = union_geoms.area()
+        else:
+            total_intersecting_area = 0.0
+        density = total_intersecting_area/area
+        return density
+
+    def compute_convexity(self, geom, area):
+        convexhull = geom.convexHull()
+        convexity = area/convexhull.area()
+        return convexity
+
+    def compute_compactness(self, geom, area, perimeter):
+        return 4 * math.pi * area / (perimeter * perimeter)
 
     def run(self):
         """Run method that performs all the real work"""
+        layers = self.iface.legendInterface().layers()
+        layer_list = []
+        self.dlg.inputLayerComboBox.clear()
+        self.dlg.filterLayerComboBox.clear()
+        for layer in layers:
+            layer_list.append(layer.name())
+        self.dlg.inputLayerComboBox.addItems(layer_list)
+        self.dlg.filterLayerComboBox.addItems(layer_list)
         # show the dialog
         self.dlg.show()
         # Run the dialog event loop
         result = self.dlg.exec_()
         # See if OK was pressed
         if result:
-            # Do something useful here - delete the line containing pass and
-            # substitute with your code.
-            pass
+            filename = self.dlg.fileLineEdit.text()
+            threshold = self.dlg.thresholdDoubleSpinBox.value()
+
+            selectedInputLayerIndex = self.dlg.inputLayerComboBox.currentIndex()
+            selectedInputLayer = layers[selectedInputLayerIndex]
+            selectedFilterLayerIndex = self.dlg.filterLayerComboBox.currentIndex()
+            selectedFilterLayer = layers[selectedFilterLayerIndex]
+            
+            print "Creating filter layer index..."
+            index = QgsSpatialIndex(selectedFilterLayer.getFeatures())
+            #for f in selectedFilterLayer.getFeatures():
+            #    index.insertFeature(f)
+            print "Filter layer index created!"
+                        
+            # create layer
+            vl = QgsVectorLayer("Polygon", "new_polygons", "memory")
+            pr = vl.dataProvider()
+
+            # Enter editing mode
+            vl.startEditing()
+
+            # add fields
+            fields = [
+                QgsField("area", QVariant.Double),
+                QgsField("density", QVariant.Double),
+                QgsField("convexity", QVariant.Double),
+                QgsField("compactness", QVariant.Double)]
+            pr.addAttributes( fields )
+            vl.updateFields()
+            
+            progressMessageBar = self.iface.messageBar().createMessage("Computing measures...")
+            progress = QProgressBar()
+            progress.setMaximum(selectedInputLayer.featureCount())
+            progress.setAlignment(Qt.AlignLeft|Qt.AlignVCenter)
+            progressMessageBar.layout().addWidget(progress)
+            self.iface.messageBar().pushWidget(progressMessageBar, self.iface.messageBar().INFO)
+            
+            featureList = []
+            i = 0
+            # add features
+            for f in selectedInputLayer.getFeatures():
+                geom = f.geometry()
+                area = geom.area()
+                perimeter = geom.length()
+                density = self.compute_density(geom, area, index, selectedFilterLayer)
+                convexity = self.compute_convexity(geom, area)
+                compacness = self.compute_compactness(geom, area, perimeter)
+                if density > threshold:
+                    feat = QgsFeature()
+                    feat.setGeometry( geom )
+                    feat.initAttributes(len(fields))
+                    feat.setAttribute( 0, area )
+                    feat.setAttribute( 1, density )
+                    feat.setAttribute( 2, convexity )
+                    feat.setAttribute( 3, compacness )
+                    featureList.append(feat)
+                i = i + 1
+                progress.setValue(i)
+
+            self.iface.messageBar().clearWidgets()
+            pr.addFeatures( featureList )
+
+            # Commit changes
+            vl.commitChanges()
+            error = QgsVectorFileWriter.writeAsVectorFormat(vl, filename, "UTF-8", None, "ESRI Shapefile")
+            QgsMapLayerRegistry.instance().addMapLayer(vl)
+            
