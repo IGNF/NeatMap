@@ -241,6 +241,7 @@ class TidyCity:
         result = self.dlg.exec_()
         # See if OK was pressed
         if result:
+			# get the parameters from the GUI
             filename = self.dlg.fileLineEdit.text()
             layername = self.dlg.layerLineEdit.text()
             threshold = self.dlg.thresholdDoubleSpinBox.value()
@@ -249,7 +250,7 @@ class TidyCity:
             selectedInputLayer = layers[selectedInputLayerIndex]
             selectedFilterLayerIndex = self.dlg.filterLayerComboBox.currentIndex()
             selectedFilterLayer = layers[selectedFilterLayerIndex]
-            
+            # create a spatial index
             print "Creating filter layer index..."
             index = QgsSpatialIndex(selectedFilterLayer.getFeatures())
             #for f in selectedFilterLayer.getFeatures():
@@ -262,7 +263,8 @@ class TidyCity:
 
             # Enter editing mode
             vl.startEditing()
-
+			
+			# TODO: ADD THE NEW MEASURES HERE!!!
             # add fields
             fields = [
                 QgsField("area", QVariant.Double),
