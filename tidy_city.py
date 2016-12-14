@@ -241,7 +241,7 @@ class TidyCity:
         result = self.dlg.exec_()
         # See if OK was pressed
         if result:
-			# get the parameters from the GUI
+            # get the parameters from the GUI
             filename = self.dlg.fileLineEdit.text()
             layername = self.dlg.layerLineEdit.text()
             threshold = self.dlg.thresholdDoubleSpinBox.value()
@@ -271,6 +271,7 @@ class TidyCity:
                 QgsField("density", QVariant.Double),
                 QgsField("convexity", QVariant.Double),
                 QgsField("compactness", QVariant.Double)]
+			# add the new measures to the features
             pr.addAttributes( fields )
             vl.updateFields()
             
