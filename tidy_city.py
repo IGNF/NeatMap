@@ -201,6 +201,10 @@ class TidyCity:
     def toggle_load(self):
         self.load = self.dlg.saveCheckBox.isChecked()
         self.dlg.layerLineEdit.setEnabled(self.load)
+	 
+    def compute_SMBR(self,geom):
+        SMBR, SMBR_area, SMBR_angle, SMBR_width, SMBR_height = geom.orientedMinimumBoundingBox()
+        return SMBR_area, SMBR_angle, SMBR_width, SMBR_height
 
     def compute_density(self, geom, area, index, filterLayer):
         intersectingfids = index.intersects(geom.boundingBox())
@@ -217,12 +221,20 @@ class TidyCity:
         density = total_intersecting_area/area
         return density
 
-    def compute_convexity(self, geom, area):
+    def compute_convexity1(self, geom, area):
         convexhull = geom.convexHull()
-        convexity = area/convexhull.area()
-        return convexity
+        convexity1 = area/convexhull.area()
+        return convexity1
+    
+    def compute_convexity2(self, area, SMBR_area):
+        convexity2 = area/SMBR_area
+        return convexity2
+		
+    def compute_elongation(self, SMBR_height, SMBR_width):
+        elongation = SMBR_height/SMBR_width
+        return elongation
 
-    def compute_compactness(self, geom, area, perimeter):
+    def compute_compactness(self, area, perimeter):
         return 4 * math.pi * area / (perimeter * perimeter)
 
     def run(self):
@@ -251,11 +263,11 @@ class TidyCity:
             selectedFilterLayerIndex = self.dlg.filterLayerComboBox.currentIndex()
             selectedFilterLayer = layers[selectedFilterLayerIndex]
             # create a spatial index
-            print "Creating filter layer index..."
+            print("Creating filter layer index...")
             index = QgsSpatialIndex(selectedFilterLayer.getFeatures())
             #for f in selectedFilterLayer.getFeatures():
             #    index.insertFeature(f)
-            print "Filter layer index created!"
+            print("Filter layer index created!")
                         
             # create layer
             vl = QgsVectorLayer("Polygon", layername, "memory")
@@ -264,12 +276,17 @@ class TidyCity:
             # Enter editing mode
             vl.startEditing()
 			
-			# TODO: ADD THE NEW MEASURES HERE!!!
             # add fields
             fields = [
                 QgsField("area", QVariant.Double),
                 QgsField("density", QVariant.Double),
-                QgsField("convexity", QVariant.Double),
+                QgsField("SMBR_area", QVariant.Double),
+                QgsField("SMBR_angle", QVariant.Double),
+                QgsField("SMBR_width", QVariant.Double),
+                QgsField("SMBR_height", QVariant.Double),
+                QgsField("convexity1", QVariant.Double),
+                QgsField("convexity2", QVariant.Double),
+                QgsField("elongation", QVariant.Double),
                 QgsField("compactness", QVariant.Double)]
 			# add the new measures to the features
             pr.addAttributes( fields )
@@ -290,16 +307,30 @@ class TidyCity:
                 area = geom.area()
                 perimeter = geom.length()
                 density = self.compute_density(geom, area, index, selectedFilterLayer)
-                convexity = self.compute_convexity(geom, area)
-                compacness = self.compute_compactness(geom, area, perimeter)
+                param_SMBR = self.compute_SMBR(geom)
+                SMBR_geom = param_SMBR[0]
+                SMBR_area = param_SMBR[1]
+                SMBR_angle = param_SMBR[2]
+                SMBR_width = param_SMBR[3]
+                SMBR_height = param_SMBR[4]
+                convexity1 = self.compute_convexity1(geom, area)
+                convexity2 = self.compute_convexity2(area, SMBR_area)
+                elongation = self.compute_elongation(SMBR_height, SMBR_width)
+                compactness = self.compute_compactness(area, perimeter)
                 if density > threshold:
                     feat = QgsFeature()
-                    feat.setGeometry( geom )
+                    feat.setGeometry( SMBR_geom )
                     feat.initAttributes(len(fields))
                     feat.setAttribute( 0, area )
                     feat.setAttribute( 1, density )
-                    feat.setAttribute( 2, convexity )
-                    feat.setAttribute( 3, compacness )
+                    feat.setAttribute( 2, SMBR_area )
+                    feat.setAttribute( 3, SMBR_angle )
+                    feat.setAttribute( 4, SMBR_width )
+                    feat.setAttribute( 5, SMBR_height )
+                    feat.setAttribute( 6, convexity1 )
+                    feat.setAttribute( 7, convexity2 )
+                    feat.setAttribute( 8, elongation)
+                    feat.setAttribute( 9, compactness )
                     featureList.append(feat)
                 i = i + 1
                 progress.setValue(i)
