@@ -29,7 +29,7 @@ from tidy_city_dialog import TidyCityDialog
 import os.path
 import math
 from qgis.core import QgsVectorLayer, QgsFeature, QgsSpatialIndex, QgsVectorFileWriter, QgsMapLayerRegistry
-from qgis.core import QgsFeatureRequest, QgsField, QgsGeometry, QgsPoint
+from qgis.core import QgsFeatureRequest, QgsField, QgsGeometry, QgsPoint, QgsRectangle
 from shapely.wkb import loads
 from shapely.ops import cascaded_union, unary_union
 
@@ -605,12 +605,15 @@ class TidyCity:
             #On range la ville !
             for g in vl.dataProvider().getFeatures():
                 geom = g.geometry()
-
+                
                 # On récupère les anciennes et nouvelles coordonnées.
                 x_init = g.attributes()[11]
                 y_init = g.attributes()[12]
                 x_new = g.attributes()[13]
                 y_new = g.attributes()[14]
+                SMBR_angle = g.attributes()[3]
+                #SMBR_width = g.attributes()[4]
+                #SMBR_height = g.attributes()[5]
 
                 if g.attributes()[15] == 39:
                     x_new = -1
@@ -636,7 +639,7 @@ class TidyCity:
                 if (isRotOk != 0):
                     return "error"
                 vl.dataProvider().changeGeometryValues({g.id():geom})
-                
+
             vl.commitChanges()
 
             self.iface.messageBar().clearWidgets()
