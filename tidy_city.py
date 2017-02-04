@@ -36,6 +36,10 @@ from shapely.ops import cascaded_union, unary_union
 class TidyCity:
     """QGIS Plugin Implementation."""
 
+    """
+    Initialisation du plugin.
+    """
+
     def __init__(self, iface):
         """Constructor.
 
@@ -201,69 +205,73 @@ class TidyCity:
     def toggle_load(self):
         self.load = self.dlg.saveCheckBox.isChecked()
         self.dlg.layerLineEdit.setEnabled(self.load)
-        
-        
-#============================== CALCUL DU SMBR =================================================================
-
-    def lineAngle(self, x1, y1, x2, y2):
-        at = math.atan2( y2 - y1, x2 - x1 )
-        a = -at + math.pi / 2.0
-        return self.normalizedAngle( a )
+	
+	
+    """
+    Méthode de calcul du SMBR.
+    """
 
     def normalizedAngle(self,  angle):
-        clippedAngle = angle;
+        clippedAngle = angle
         if ( clippedAngle >= math.pi * 2 or clippedAngle <= -2 * math.pi ):
             clippedAngle = math.fmod( clippedAngle, 2 * math.pi)
         if ( clippedAngle < 0.0 ):
             clippedAngle += 2 * math.pi
         return clippedAngle
 
-    def compute_SMBR(self,geom):
-        area = float("inf");
-        angle = 0;
-        width = float("inf");
-        height =  float("inf");
+    def lineAngle(self, x1, y1, x2, y2):
+        at = math.atan2( y2 - y1, x2 - x1 )
+        a = -at + math.pi / 2.0
+        return self.normalizedAngle( a )
+
+    def compute_SMBR(self, geom):
+        area = float("inf")
+        angle = 0
+        width = float("inf")
+        height =  float("inf")
         
         if (geom is None):
-            return  QgsGeometry();
+            return  QgsGeometry()
  
-        hull = geom.convexHull();
+        hull = geom.convexHull()
         if ( hull.isEmpty() ):
-            return QgsGeometry();
+            return QgsGeometry()
         x = hull.asPolygon()
-        vertexId = 0;
+        vertexId = 0
         pt0 = x[0][vertexId]
         pt1 = pt0
-        prevAngle = 0.0;
-        size = len(x[0]);
+        prevAngle = 0.0
+        size = len(x[0])
         for vertexId in range(0,  size-0):
             pt2 = x[0][vertexId]
-            currentAngle = self.lineAngle( pt1.x(), pt1.y(), pt2.x(), pt2.y() );
-            rotateAngle = 180.0 / math.pi *  ( currentAngle - prevAngle );
-            prevAngle = currentAngle;
+            currentAngle = self.lineAngle( pt1.x(), pt1.y(), pt2.x(), pt2.y() )
+            rotateAngle = 180.0 / math.pi *  (currentAngle - prevAngle)
+            prevAngle = currentAngle
             
-            t = QTransform.fromTranslate( pt0.x(), pt0.y() );
-            t.rotate( rotateAngle );
-            t.translate( -pt0.x(), -pt0.y() );
+            t = QTransform.fromTranslate( pt0.x(), pt0.y() )
+            t.rotate(rotateAngle)
+            t.translate( -pt0.x(), -pt0.y() )
             hull.transform(t)
             
-            bounds = hull.boundingBox();
-            currentArea = bounds.width() * bounds.height();
+            bounds = hull.boundingBox()
+            currentArea = bounds.width() * bounds.height()
             if ( currentArea  < area ):
-                minRect = bounds;
-                area = currentArea;
-                angle = 180.0 / math.pi * currentAngle;
-                width = bounds.width();
-                height = bounds.height();
-            pt2 = pt1;
-        minBounds = QgsGeometry.fromRect( minRect );
-        minBounds.rotate( angle, QgsPoint( pt0.x(), pt0.y() ) );
+                minRect = bounds
+                area = currentArea
+                angle = 180.0 / math.pi * currentAngle
+                width = bounds.width()
+                height = bounds.height()
+            pt2 = pt1
+        minBounds = QgsGeometry.fromRect( minRect )
+        minBounds.rotate( angle, QgsPoint( pt0.x(), pt0.y() ) )
         if ( angle > 180.0 ):
-            angle = math.fmod( angle, 180.0 );
+            angle = math.fmod( angle, 180.0 )
         return minBounds, area, angle, width, height
 
             
-#============================== CALCUL DES INDICATEURS ==============================================================
+    """
+    Méthodes de calcul des indicateurs.
+    """
 
     def compute_density(self, geom, area, index, filterLayer):
         intersectingfids = index.intersects(geom.boundingBox())
@@ -280,25 +288,38 @@ class TidyCity:
         density = total_intersecting_area/area
         return density
 
+    def compute_elongation(self, SMBR_height, SMBR_width):
+        """
+        Calcul de l'élongation.
+        """
+        elongation = SMBR_height/SMBR_width
+        return elongation
+
+    def compute_compactness(self, area, perimeter):
+        """
+        Calcul de la compacité.
+        """
+        return 4 * math.pi * area / (perimeter * perimeter)
+    
     def compute_convexity1(self, geom, area):
+        """
+        Calcul de la convexité selon l'enveloppe convexe.
+        """
         convexhull = geom.convexHull()
         convexity1 = area/convexhull.area()
         return convexity1
         
     def compute_convexity2(self, area, SMBR_area):
+        """
+        Calcul de la convexité selon le SMBR.
+        """
         convexity2 = area/SMBR_area	
         return convexity2
-		
-    def compute_elongation(self, SMBR_height, SMBR_width):
-        elongation = SMBR_height/SMBR_width
-        return elongation
-
-    def compute_compactness(self, area, perimeter):
-        return 4 * math.pi * area / (perimeter * perimeter)
         
     def compute_sidesnumber(self,geom):
         """
-        TO DO : virer les cotés < une certaine longueur (10m ?)
+        Calcul du nombre de côtés simplifié. 
+        Méthode non aboutie.
         """
         simple_geom = geom.simplify(10.0)
         verysimple_geom = simple_geom.simplify(10.0)
@@ -309,11 +330,14 @@ class TidyCity:
             ver = verysimple_geom.vertexAt(nb_sides)
         return verysimple_geom, nb_sides
         
-        
 
+    """
+    Fonction run.
+    """
 
     def run(self):
         """Run method that performs all the real work"""
+	
         layers = self.iface.legendInterface().layers()
         layer_list = []
         self.dlg.inputLayerComboBox.clear()
@@ -340,9 +364,6 @@ class TidyCity:
             # create a spatial index
             print("Creating filter layer index...")
             index = QgsSpatialIndex(selectedFilterLayer.getFeatures())
-            #for f in selectedFilterLayer.getFeatures():
-            #    index.insertFeature(f)
-            print("Filter layer index created!")
                         
             # create layer
             vl = QgsVectorLayer("Polygon", layername, "memory")
@@ -381,7 +402,7 @@ class TidyCity:
             progressMessageBar.layout().addWidget(progress)
             self.iface.messageBar().pushWidget(progressMessageBar, self.iface.messageBar().INFO)
             
-            featureList = []
+	    featureList = []
             i = 0
             
             # add features
@@ -419,8 +440,7 @@ class TidyCity:
                     
                 elif convexity1 < 0.80:
                     group = 2 #105 OK
-                    #voir éventuellement à isoler les énormes îlots bizarres pour en faire une catégorie propre..
-                    
+                     
                 elif elongation > 0.75 and elongation < 1.25 and compactness < 0.6:
                     group = 4 #120 OK
                 elif elongation > 0.75 and elongation < 1.25 and compactness > 0.6 and compactness < 0.7 and convexity2 < 0.6:
@@ -496,11 +516,7 @@ class TidyCity:
                 elif elongation > 3.75 or elongation < 1/3.75:
                     group = 37 #176 OK
 
-                else:
-                    group = 39
                     
-                length_groups = [4, 105, 103, 120, 90, 108, 104, 155, 97, 93, 141, 115, 94, 142, 144, 97, 115, 111, 90, 93, 151, 108, 166, 128, 116, 159, 147, 105, 99, 129, 146, 99, 136, 134, 132, 169, 176, 119]
-                
                 # Calcul des coordonnées du centroide de chaque îlot.
                 centroid = geom.centroid().asPoint()
                 x_init = centroid[0]
@@ -534,71 +550,81 @@ class TidyCity:
             vl.commitChanges()
             vl.startEditing()
             
-            #Calcul de y_new (en fonction de la taille) :
+            # Calcul de y_new (selon la taille) :
                 
             level = 0
             prec_highest_feature = 0
-            #parcours de tous les groupes
+            # Parcours de tous les groupes
             for i in range(1,39):
-
                 highest_feature = 0
-            
+                # Parcours des îlots
                 for h in vl.dataProvider().getFeatures():
                     SMBR_height = h.attributes()[5]
-                    #test : l'entité est-elle membre du groupe en cours ?
+                    # L'entité est-elle membre du groupe en cours ?
                     if h.attributes()[15] == i:
-                        #on récupère la + haute entité du groupe
+                        # On récupère la plus haute entité du groupe
                         if SMBR_height > highest_feature:
                             highest_feature = SMBR_height
-                            
-                level += highest_feature/2 + prec_highest_feature/2
+                
+                # On peut ainsi connaître l'espace à laisser en hauteur entre les 2 groupes successifs
+                level += highest_feature/1.5 + prec_highest_feature/1.5
                 prec_highest_feature = highest_feature
                 
                 for h in vl.dataProvider().getFeatures():
                     if h.attributes()[15] == i:
-                        #si oui, on lui attribue le y correspondant
+                        # Attribution du y correspondant
                         vl.changeAttributeValue(h.id(), 14, level)
-                            
-                        
+                                                    
             vl.commitChanges()
             vl.startEditing()
             
-            #Calcul de x_new (en fonction de la hauteur) :
+            # Calcul de x_new :
             
-                
-##            for i in range(1,39):
-##                
-##                for k in range(length_groups[i-1]) :
-##                
-##                    for j in vl.dataProvider().getFeatures():
-##                        #récupération de la largeur de l'entité redressée (= celle du SMBR)
-##                        geom = j.geometry()
-##                        SMBR_width = j.attributes()[4]
-##                        #récupération du n° de groupe
-##                        group = j.attributes()[15]
-##                        #test : l'entité est-elle membre du groupe en cours ?
-##                        if group == i:
-##                            if SMBR_width > widest_feature_size:
-##                                widest_feature_size = SMBR_width
-##                                widest_feature = j
-##                    vl.changeAttributeValue(widest_feature.id(), 13, level)
-##                    level += widest_feature_size
-                    
-# VERSION ALTERNATIVE + RAPIDE SANS TRI PAR TAILLE (au lieu des trois boucles imbriquées au-dessus)
-#            
+            # Rangement suivant l'ordre d'arrivée des îlots 
+            """
             for i in range(1,39):
                 prec_width = 0
                 level = 0
+                prec_width = 0
                 width = 0
-                
+                height = 0
                 for j in vl.dataProvider().getFeatures():
-                    #test : l'entité est-elle membre du groupe en cours ?
+                    # L'entité est-elle membre du groupe en cours ?
                     if j.attributes()[15] == i:
                         width = j.attributes()[4]
-                        level += width + prec_width
+                        height = j.attributes()[5]
+                        level += width + prec_width + height
                         vl.changeAttributeValue(j.id(), 13, level)
                         prec_width = width
                 
+            vl.commitChanges()
+            vl.startEditing()
+            """
+            
+            # Rangement suivant la taille des îlots 
+            for i in range(1, 39):
+                liste = []
+                level = 0
+                prec_width = 0
+                width = 0
+                height = 0
+                for j in vl.dataProvider().getFeatures():
+                    if j.attributes()[15] == i:
+                        liste += [j.attributes()[5]]
+                liste.sort()
+                k = 0
+                while k in range(1000):
+                    for j in vl.dataProvider().getFeatures():
+                        if j.attributes()[15] == i and liste != []:
+                            if j.attributes()[5] == liste[-1]:
+                                liste.pop()
+                                width = j.attributes()[4]
+                                height = j.attributes()[5]
+                                level += width + prec_width + height
+                                vl.changeAttributeValue(j.id(), 13, level)
+                                prec_width = width
+                    k += 1
+                                                
             vl.commitChanges()
             vl.startEditing()
             
@@ -611,22 +637,15 @@ class TidyCity:
                 y_init = g.attributes()[12]
                 x_new = g.attributes()[13]
                 y_new = g.attributes()[14]
-                SMBR_angle = g.attributes()[3]
-                #SMBR_width = g.attributes()[4]
-                #SMBR_height = g.attributes()[5]
-
-                if g.attributes()[15] == 39:
-                    x_new = -1
-                    y_new = -1
-                
+                                
                 # Calcul des paramètres du déplacement.
                 dx = x_new - x_init
                 dy = y_new - y_init
-                centre_rot = QgsPoint(x_new,y_new)
-                if SMBR_angle < math.pi/2:
-                    angle_rot = math.pi/2 - SMBR_angle
+                centre_rota = QgsPoint(x_new,y_new)
+                if SMBR_angle < 90:
+                    angle_rota = 90 - SMBR_angle #en degré
                 else:
-                    angle_rot = -(math.pi/2 - SMBR_angle)
+                    angle_rota = SMBR_angle - 90
                 
                 # Translation.
                 isTransformOk = geom.translate(dx,dy)
@@ -634,23 +653,23 @@ class TidyCity:
                     return "error"
                 vl.dataProvider().changeGeometryValues({g.id():geom})
                 
-                #Rotation.
-                isRotOk = geom.rotate(angle_rot, centre_rot)
-                if (isRotOk != 0):
-                    return "error"
-                vl.dataProvider().changeGeometryValues({g.id():geom})
+                # Rotation des îlots
+                if SMBR_angle < 90:
+                    isRotOk = geom.rotate(angle_rota, centre_rota)
+                    if (isRotOk != 0):
+                        return "error"
+                    vl.dataProvider().changeGeometryValues({g.id():geom})
+                else:
+                    isRotOk = geom.rotate(-angle_rota, centre_rota)
+                    if (isRotOk != 0):
+                        return "error"
+                    vl.dataProvider().changeGeometryValues({g.id():geom})
 
             vl.commitChanges()
 
             self.iface.messageBar().clearWidgets()
-            
-
-            # Commit changes
-            #zvl.commitChanges()
             if self.save:
                 error = QgsVectorFileWriter.writeAsVectorFormat(vl, filename, "UTF-8", None, "ESRI Shapefile")
             if self.load:
                 QgsMapLayerRegistry.instance().addMapLayer(vl)
-                
-            #Affichage
-            #Zommer sur la couche !
+
