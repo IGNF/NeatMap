@@ -15,17 +15,18 @@ def calculate(layerName, layerPolygon, idLayerPolygon):
     pr = vl.dataProvider()
     vl.startEditing()
     fields = [      QgsField(idLayerPolygon, QVariant.String),
-                    QgsField("area", QVariant.Double),
-                    QgsField("SMBR_area", QVariant.Double),
-                    QgsField("SMBR_angle", QVariant.Double),
-                    QgsField("SMBR_w.", QVariant.Double),
-                    QgsField("SMBR_h.", QVariant.Double),
-                    QgsField("convexity1", QVariant.Double),
-                    QgsField("convexity2", QVariant.Double),
-                    QgsField("elongation", QVariant.Double),
-                    QgsField("compact.", QVariant.Double),
-                    QgsField("area/perim", QVariant.Double),
-                    QgsField("complexity", QVariant.Double)]
+                    QgsField("area", QVariant.Double, "Real", 10, 3),
+                    QgsField("SMBR_area", QVariant.Double, "Real",10, 3),
+                    QgsField("SMBR_angle", QVariant.Double, "Real",10, 3),
+                    QgsField("SMBR_w.", QVariant.Double, "Real",10, 3),
+                    QgsField("SMBR_h.", QVariant.Double, "Real",10, 3),
+                    QgsField("convexity1", QVariant.Double, "Real",10, 3),
+                    QgsField("convexity2", QVariant.Double, "Real",10, 3),
+                    QgsField("elongation", QVariant.Double, "Real",10, 3),
+                    QgsField("compact.", QVariant.Double, "Real",10, 3),
+                    QgsField("area/perim", QVariant.Double, "Real",10, 3),
+                    QgsField("complexity", QVariant.Double, "Real",10, 3)]
+    # (const QString &name=QString(), QVariant::Type type=QVariant::Invalid, const QString &typeName=QString(), int len=0, int prec=0, const QString &comment=QString(), QVariant::Type subType=QVariant::Invalid)
     pr.addAttributes( fields )
     vl.updateFields()
     
@@ -68,4 +69,6 @@ def calculate(layerName, layerPolygon, idLayerPolygon):
         featureList.append(feat)  
     pr.addFeatures(featureList)
     vl.commitChanges()
+    vl.updateFields()
+    vl.endEditCommand()
     return vl       

@@ -146,12 +146,6 @@
      </item>
     </layout>
    </widget>
-   <zorder>layoutWidget_2</zorder>
-   <zorder>layoutWidget</zorder>
-   <zorder>layoutWidget</zorder>
-   <zorder>layoutWidget_2</zorder>
-   <zorder>pushButtonCalculation</zorder>
-   <zorder>layoutWidget_4</zorder>
   </widget>
   <widget class="Line" name="line">
    <property name="geometry">
@@ -241,8 +235,8 @@
    <widget class="QScrollArea" name="scrollArea">
     <property name="geometry">
      <rect>
-      <x>0</x>
-      <y>70</y>
+      <x>-1</x>
+      <y>69</y>
       <width>501</width>
       <height>151</height>
      </rect>

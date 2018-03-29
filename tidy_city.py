@@ -22,7 +22,7 @@
 """
 from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QVariant, Qt, pyqtSlot
 from PyQt5.QtGui import QIcon, QTransform
-from PyQt5.QtWidgets import QAction, QProgressBar, QCheckBox
+from PyQt5.QtWidgets import QAction, QProgressBar, QCheckBox, QFrame, QVBoxLayout
 from .indicatorCalculation import *
 from .resources import *
 # Initialize Qt resources from file resources.py
@@ -181,6 +181,12 @@ class TidyCity:
         self.dlg.pushButtonCalculation.clicked.connect(self.processCalculation)
         self.dlg.inputPolygonLayer.activated.connect(self.updatePolygonLayer)
         self.dlg.inputPolygonLayerClass.activated.connect(self.updatePolygonLayerClass)
+        scrollArea = self.dlg.scrollArea;
+        scrollArea.setWidgetResizable(True)
+        scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        inner = QFrame(scrollArea)
+        inner.setLayout(QVBoxLayout())
+        scrollArea.setWidget(inner)
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
@@ -209,6 +215,7 @@ class TidyCity:
         self.updateDropBoxes()
         # show the dialog
         self.dlg.show()
+        
         # Run the dialog event loop
         result = self.dlg.exec_()
 
@@ -354,6 +361,7 @@ class TidyCity:
             self.dlg.inputPolygonLayerClass.addItem(layer.name(),layer)
         #Refresh the dropbox with attribute list    
         self.refreshAttributeDropBox()
+        self.refreshDropDownLayerPanel()
         
     """
     
@@ -377,14 +385,7 @@ class TidyCity:
             
             count = selectedInputLayer.featureCount();
 
-            #If there is a feature, getting the attributes from first feature
-            if count > 0:
-                feature = QgsFeature()  
-                request = QgsFeatureRequest().setFilterFid(0)
-                selectedInputLayer.getFeatures(request).nextFeature(feature)
-                attrs = feature.fields()
-              
-                for a in attrs:
+            for a in selectedInputLayer.fields():
                     self.dlg.intputIDChoice.addItem(a.displayName(),a)
  
 
@@ -398,18 +399,39 @@ class TidyCity:
     Section 2
     
     """          
-
+    #Action when layer from classification is refreshed
     def updatePolygonLayerClass(self):
         self.refreshDropDownLayerPanel()
 
     
     def refreshDropDownLayerPanel(self):
-        b1 = QCheckBox("Button1")
-        b2 = QCheckBox("Button2")
-        b3 = QCheckBox("Button3")        
-        self.dlg.scrollArea.addWidget(b1)
-        self.dlg.scrollArea.addWidget(b2)
-        self.dlg.scrollArea.addWidget(b3)
+        layout =  self.dlg.scrollArea.widget().layout()
+        #Cleaning layout
+        
+        for i in reversed(range(layout.count())): 
+            widgetToRemove = layout.itemAt( i ).widget()
+            # remove it from the layout list
+            layout.removeWidget( widgetToRemove )
+            # remove it from the gui
+            widgetToRemove.setParent( None )
+        
+        layers = QgsProject.instance().mapLayers().values()
+        
+        selectedInputLayerIndex = self.dlg.inputPolygonLayerClass.currentIndex()
+        
+        if selectedInputLayerIndex > -1 :
+            #Getting the selected layer 
+            selectedInputLayer = self.dlg.inputPolygonLayerClass.itemData(selectedInputLayerIndex)
+            
+            count = selectedInputLayer.featureCount();
+
+
+            for a in selectedInputLayer.fields():
+                if (a.isNumeric()) :
+                    checkBox = QCheckBox(a.displayName())
+                    layout.addWidget(checkBox)
+
+
     """
     
     
@@ -431,9 +453,15 @@ class TidyCity:
         QgsMessageLog.logMessage("Calculating indicator on layer : " + layername, "Tidy City", Qgis.Info)            
         vlOut = calculate(layername,selectedInputLayer,intputIDChoiceValue.displayName());
         QgsMessageLog.logMessage("Adding layer to map", "Tidy City", Qgis.Info)
-        QgsProject.instance().addMapLayer(vlOut) 
+        QgsProject.instance().addMapLayer(vlOut)
+        self.updateDropBoxes()
+        self.selectItem(self.dlg.inputPolygonLayerClass,vlOut.name())
 
 
+    def selectItem(self, dialog, text):
+        for i in range(0,dialog.count()):
+            if text in dialog.itemText(i):
+                dialog.setCurrentIndex(i)
 
 
 
