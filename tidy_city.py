@@ -251,26 +251,7 @@ class TidyCity:
         
         # Calcul de x_new :
         
-        # Rangement suivant l'ordre d'arrivée des îlots 
-        """
-        for i in range(1,39):
-            prec_width = 0
-            level = 0
-            prec_width = 0
-            width = 0
-            height = 0
-            for j in vl.dataProvider().getFeatures():
-                # L'entité est-elle membre du groupe en cours ?
-                if j.attributes()[15] == i:
-                    width = j.attributes()[4]
-                    height = j.attributes()[5]
-                    level += width + prec_width + height
-                    vl.changeAttributeValue(j.id(), 13, level)
-                    prec_width = width
-            
-        vl.commitChanges()
-        vl.startEditing()
-        """
+
         
         # Rangement suivant la taille des îlots 
         for i in range(1, 39):
