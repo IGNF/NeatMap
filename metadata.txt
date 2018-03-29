@@ -8,11 +8,11 @@
 
 [general]
 name=TidyCity
-qgisMinimumVersion=2.0
+qgisMinimumVersion=3.0
 description=A simple QGIS python plugin for building tidy cities.
-version=0.1
+version=0.3
 author=IGN
-email=julien.perret@gmail.com
+email=julien.perret@gmail.com; mickael.brasebin@ign.fr
 
 about=A simple QGIS python plugin for building tidy cities. Initially developped in the context of a student projet by Rose and Bruce at ENSG/IGNF.
 

@@ -23,13 +23,14 @@
 
 import os
 
-from PyQt4 import QtGui, uic
+from PyQt5 import QtGui, uic
+from PyQt5.QtWidgets import  QDialog
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'tidy_city_dialog_base.ui'))
 
 
-class TidyCityDialog(QtGui.QDialog, FORM_CLASS):
+class TidyCityDialog(QDialog, FORM_CLASS):
     def __init__(self, parent=None):
         """Constructor."""
         super(TidyCityDialog, self).__init__(parent)
