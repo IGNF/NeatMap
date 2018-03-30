@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>580</width>
-    <height>906</height>
+    <height>995</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -44,7 +44,7 @@
         </size>
        </property>
        <property name="text">
-        <string>Output Layer Name</string>
+        <string>Output layer name : </string>
        </property>
       </widget>
      </item>
@@ -57,7 +57,7 @@
         </size>
        </property>
        <property name="text">
-        <string>new_polygons</string>
+        <string>indicator_layer</string>
        </property>
       </widget>
      </item>
@@ -82,7 +82,7 @@
         </size>
        </property>
        <property name="text">
-        <string>Input Layer :</string>
+        <string>Input layer :</string>
        </property>
       </widget>
      </item>
@@ -184,25 +184,12 @@
      <x>30</x>
      <y>260</y>
      <width>511</width>
-     <height>391</height>
+     <height>411</height>
     </rect>
    </property>
    <property name="title">
     <string>2/ Classification</string>
    </property>
-   <widget class="QPushButton" name="pushButtonClassification">
-    <property name="geometry">
-     <rect>
-      <x>400</x>
-      <y>360</y>
-      <width>99</width>
-      <height>27</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Ok</string>
-    </property>
-   </widget>
    <widget class="QWidget" name="layoutWidget_3">
     <property name="geometry">
      <rect>
@@ -216,7 +203,7 @@
      <item>
       <widget class="QLabel" name="label_7">
        <property name="text">
-        <string>Input Layer:</string>
+        <string>Input layer :</string>
        </property>
       </widget>
      </item>
@@ -268,7 +255,7 @@
      <item>
       <widget class="QLabel" name="label_2">
        <property name="text">
-        <string>Number of classes</string>
+        <string>Number of classes :</string>
        </property>
       </widget>
      </item>
@@ -286,6 +273,9 @@
          <height>25</height>
         </size>
        </property>
+       <property name="text">
+        <string>3</string>
+       </property>
       </widget>
      </item>
     </layout>
@@ -294,7 +284,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>310</y>
+      <y>360</y>
       <width>501</width>
       <height>41</height>
      </rect>
@@ -303,7 +293,7 @@
      <item>
       <widget class="QLabel" name="label_3">
        <property name="text">
-        <string>LayerName</string>
+        <string>Output layer name :</string>
        </property>
       </widget>
      </item>
@@ -315,6 +305,9 @@
          <height>25</height>
         </size>
        </property>
+       <property name="text">
+        <string>classified_layer</string>
+       </property>
       </widget>
      </item>
     </layout>
@@ -323,7 +316,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>60</y>
+      <y>70</y>
       <width>511</width>
       <height>29</height>
      </rect>
@@ -354,12 +347,57 @@
      </item>
     </layout>
    </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget_3">
+    <property name="geometry">
+     <rect>
+      <x>-1</x>
+      <y>310</y>
+      <width>501</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QLabel" name="classAttLineEdit">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>25</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Classification attribute : </string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="lineEditAttClass">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>25</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>class</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <zorder>layoutWidget_3</zorder>
+   <zorder>scrollArea</zorder>
+   <zorder>horizontalLayoutWidget</zorder>
+   <zorder>horizontalLayoutWidget_2</zorder>
+   <zorder>layoutWidget_5</zorder>
+   <zorder>horizontalLayoutWidget_3</zorder>
+   <zorder>label_11</zorder>
   </widget>
   <widget class="Line" name="line_2">
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>650</y>
+     <y>710</y>
      <width>581</width>
      <height>20</height>
     </rect>
@@ -372,13 +410,26 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>670</y>
+     <y>730</y>
      <width>551</width>
      <height>131</height>
     </rect>
    </property>
    <property name="title">
     <string>3/ Layout positionning</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButtonClassification">
+   <property name="geometry">
+    <rect>
+     <x>430</x>
+     <y>670</y>
+     <width>99</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Ok</string>
    </property>
   </widget>
  </widget>

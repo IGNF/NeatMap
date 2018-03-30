@@ -24,6 +24,7 @@ from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QVa
 from PyQt5.QtGui import QIcon, QTransform
 from PyQt5.QtWidgets import QAction, QProgressBar, QCheckBox, QFrame, QVBoxLayout
 from .indicatorCalculation import *
+from .classification import *
 from .resources import *
 # Initialize Qt resources from file resources.py
 #import resources
@@ -33,6 +34,8 @@ import os.path
 import math
 from qgis.core import *
 from qgis.gui import *
+
+from random import randrange
 
 class TidyCity:
     """QGIS Plugin Implementation."""
@@ -179,6 +182,8 @@ class TidyCity:
             parent=self.iface.mainWindow())
         #Button to process calculation
         self.dlg.pushButtonCalculation.clicked.connect(self.processCalculation)
+        self.dlg.pushButtonClassification.clicked.connect(self.processClassification)        
+        
         self.dlg.inputPolygonLayer.activated.connect(self.updatePolygonLayer)
         self.dlg.inputPolygonLayerClass.activated.connect(self.updatePolygonLayerClass)
         scrollArea = self.dlg.scrollArea;
@@ -187,7 +192,7 @@ class TidyCity:
         inner = QFrame(scrollArea)
         inner.setLayout(QVBoxLayout())
         scrollArea.setWidget(inner)
-
+        self.updateDropBoxes()
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
@@ -212,7 +217,7 @@ class TidyCity:
 
     def run(self):
         """Run method that performs all the real work"""
-        self.updateDropBoxes()
+
         # show the dialog
         self.dlg.show()
         
@@ -373,7 +378,8 @@ class TidyCity:
      
     #Action when layer from indicator calculation is refreshed    
     def updatePolygonLayer(self):
-         self.refreshAttributeDropBox()    
+         self.refreshAttributeDropBox()
+   
         
     """
     
@@ -402,6 +408,10 @@ class TidyCity:
             for a in selectedInputLayer.fields():
                     self.dlg.intputIDChoiceClassif.addItem(a.displayName(),a)
                     
+    
+    
+    
+
                     
     def refreshDropDownLayerPanel(self):
         layout =  self.dlg.scrollArea.widget().layout()
@@ -431,6 +441,42 @@ class TidyCity:
                     layout.addWidget(checkBox)
 
 
+    def categorizedColor(self, vectorLayer, classAttNam):
+        # provide file name index and field's unique values
+        fni = vectorLayer.fields().indexFromName(classAttNam)
+        unique_values = vectorLayer.uniqueValues(fni)
+        
+        # fill categories
+        categories = []
+        for unique_value in unique_values:
+            # initialize the default symbol for this geometry type
+            symbol =     QgsSymbol.defaultSymbol(vectorLayer.geometryType())
+        
+            # configure a symbol layer
+            layer_style = {}
+            layer_style['color'] = '%d, %d, %d' % (randrange(0, 256), randrange(0, 256), randrange(0, 256))
+            layer_style['outline'] = '#000000'
+            symbol_layer = QgsSimpleFillSymbolLayer.create(layer_style)
+        
+            # replace default symbol layer with the configured one
+            if symbol_layer is not None:
+                symbol.changeSymbolLayer(0, symbol_layer)
+        
+            # create renderer object
+            category = QgsRendererCategory(unique_value, symbol, str(unique_value))
+            # entry for the list of category items
+            categories.append(category)
+        
+        # create renderer object
+        renderer = QgsCategorizedSymbolRenderer(classAttNam, categories)
+        
+        # assign the created renderer to the layer
+        if renderer is not None:
+            vectorLayer.setRenderer(renderer)
+        
+        vectorLayer.triggerRepaint() 
+
+
     """
     
     
@@ -447,20 +493,60 @@ class TidyCity:
         layername = self.dlg.LineEditTemporaryLayerName.text()    
         QgsMessageLog.logMessage("Calculating indicator on layer : " + layername, "Tidy City", Qgis.Info)
         intputIDChoiceIndex = self.dlg.intputIDChoice.currentIndex()
-        intputIDChoiceValue = self.dlg.intputIDChoice.itemData(intputIDChoiceIndex)
-        QgsMessageLog.logMessage("ID value : " + intputIDChoiceValue.displayName(), "Tidy City", Qgis.Info)     
+        intputIDChoiceValue = self.dlg.intputIDChoice.itemData(intputIDChoiceIndex).displayName()
+        QgsMessageLog.logMessage("ID value : " + intputIDChoiceValue, "Tidy City", Qgis.Info)     
         QgsMessageLog.logMessage("Calculating indicator on layer : " + layername, "Tidy City", Qgis.Info)            
-        vlOut = calculate(layername,selectedInputLayer,intputIDChoiceValue.displayName());
+        vlOut = calculate(layername, selectedInputLayer,intputIDChoiceValue);
         QgsMessageLog.logMessage("Adding layer to map", "Tidy City", Qgis.Info)
         QgsProject.instance().addMapLayer(vlOut)
         self.updateDropBoxes()
+        self.updatePolygonLayerClass()
         self.selectItem(self.dlg.inputPolygonLayerClass,vlOut.name())
-
+        self.selectItem(self.dlg.intputIDChoiceClassif, intputIDChoiceValue)
+        self.selectItem(self.dlg.inputPolygonLayer,selectedInputLayer.name())
+    
+    def processClassification(self):
+        selectedInputLayerIndex = self.dlg.inputPolygonLayerClass.currentIndex()
+        selectedInputLayer = self.dlg.inputPolygonLayerClass.itemData(selectedInputLayerIndex)
+        QgsMessageLog.logMessage("Layer selected : " + selectedInputLayer.name(), "Tidy City", Qgis.Info)
+        attributes = self.listingCheckedAttributes()
+        QgsMessageLog.logMessage("Attributes selected : " + str(len(attributes)), "Tidy City", Qgis.Info)
+         
+        strNumberOfClasses = self.dlg.classifNumberOfClasses.text()
+        numberOfClasses = int(strNumberOfClasses)
+        
+        QgsMessageLog.logMessage("Number of classes : " + str(numberOfClasses), "Tidy City", Qgis.Info)
+        
+        layername = self.dlg.classLayerName.text()    
+        QgsMessageLog.logMessage("Calculating indicator on layer : " + layername, "Tidy City", Qgis.Info)
+        
+        intputIDChoiceIndex = self.dlg.intputIDChoiceClassif.currentIndex()
+        intputIDChoiceValue = self.dlg.intputIDChoiceClassif.itemData(intputIDChoiceIndex).displayName()
+        QgsMessageLog.logMessage("ID value : " + intputIDChoiceValue, "Tidy City", Qgis.Info)
+        
+        
+        attributeClass = self.dlg.lineEditAttClass.text()
+        
+        QgsMessageLog.logMessage("Attribute for classification: " + attributeClass, "Tidy City", Qgis.Info)               
+        
+        layerClassified = kmeans(selectedInputLayer, attributes, numberOfClasses, layername, attributeClass, intputIDChoiceValue)
+        QgsMessageLog.logMessage("Adding layer to map", "Tidy City", Qgis.Info)
+        QgsProject.instance().addMapLayer(layerClassified)
+        self.categorizedColor(layerClassified, attributeClass)
 
     def selectItem(self, dialog, text):
         for i in range(0,dialog.count()):
             if text in dialog.itemText(i):
                 dialog.setCurrentIndex(i)
-
+    
+    def listingCheckedAttributes(self):
+        attributes = []
+        layout =  self.dlg.scrollArea.widget().layout()
+        for i in reversed(range(layout.count())):
+            if  layout.itemAt(i).widget().isChecked():
+                attributes.append(layout.itemAt(i).widget().text())
+            #QgsMessageLog.logMessage("--WIDGET---", "Tidy City", Qgis.Info)
+            #QgsMessageLog.logMessage(""+str(type(layout.itemAt(i).widget())), "Tidy City", Qgis.Info)
+        return attributes
 
 
