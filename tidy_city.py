@@ -342,7 +342,7 @@ class TidyCity:
             self.dlg.inputPolygonLayerClass.addItem(layer.name(),layer)
         #Refresh the dropbox with attribute list    
         self.refreshAttributeDropBox()
-        self.refreshDropDownLayerPanel()
+        self.updatePolygonLayerClass()
         
     """
     
@@ -383,8 +383,26 @@ class TidyCity:
     #Action when layer from classification is refreshed
     def updatePolygonLayerClass(self):
         self.refreshDropDownLayerPanel()
+        self.refreshAttributeDropBoxClassif()
 
-    
+        #Refresh the ID attribute list from indicator calculation step
+    def refreshAttributeDropBoxClassif(self):  
+        #Listing layers  
+        layers = QgsProject.instance().mapLayers().values()
+        self.dlg.intputIDChoiceClassif.clear()        
+        
+        selectedInputLayerIndex = self.dlg.inputPolygonLayerClass.currentIndex()
+        
+        if selectedInputLayerIndex > -1 :
+            #Getting the selected layer 
+            selectedInputLayer = self.dlg.inputPolygonLayerClass.itemData(selectedInputLayerIndex)
+            
+            count = selectedInputLayer.featureCount();
+
+            for a in selectedInputLayer.fields():
+                    self.dlg.intputIDChoiceClassif.addItem(a.displayName(),a)
+                    
+                    
     def refreshDropDownLayerPanel(self):
         layout =  self.dlg.scrollArea.widget().layout()
         #Cleaning layout
