@@ -180,19 +180,9 @@ class TidyCity:
             text=self.tr(u'Build a tidy city'),
             callback=self.run,
             parent=self.iface.mainWindow())
-        #Button to process calculation
-        self.dlg.pushButtonCalculation.clicked.connect(self.processCalculation)
-        self.dlg.pushButtonClassification.clicked.connect(self.processClassification)        
+
         
-        self.dlg.inputPolygonLayer.activated.connect(self.updatePolygonLayer)
-        self.dlg.inputPolygonLayerClass.activated.connect(self.updatePolygonLayerClass)
-        scrollArea = self.dlg.scrollArea;
-        scrollArea.setWidgetResizable(True)
-        scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        inner = QFrame(scrollArea)
-        inner.setLayout(QVBoxLayout())
-        scrollArea.setWidget(inner)
-        self.updateDropBoxes()
+
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
@@ -217,7 +207,7 @@ class TidyCity:
 
     def run(self):
         """Run method that performs all the real work"""
-
+        self.prepareGUI()
         # show the dialog
         self.dlg.show()
         
@@ -327,7 +317,30 @@ class TidyCity:
         self.iface.messageBar().clearWidgets()
 
 	
-    
+    """
+    GUI Iniialization
+    """
+    def prepareGUI(self):   
+        #Button to process calculation
+        self.dlg.pushButtonCalculation.clicked.connect(self.processCalculation)
+        self.dlg.pushButtonClassification.clicked.connect(self.processClassification)        
+        
+        #DropDown are updated when dropdown layer are activated
+        self.dlg.inputPolygonLayer.activated.connect(self.updatePolygonLayer)
+        self.dlg.inputPolygonLayerClass.activated.connect(self.updatePolygonLayerClass)
+        self.dlg.inputPolygonLayerLayout.activated.connect(self.updateLayoutLayer)
+        
+        #Updating the list of available attributes
+        scrollArea = self.dlg.scrollArea;
+        scrollArea.setWidgetResizable(True)
+        scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        inner = QFrame(scrollArea)
+        inner.setLayout(QVBoxLayout())
+        scrollArea.setWidget(inner)
+        #Updating all the dropboxes
+        self.updateDropBoxes()
+        
+        
     """
     
     Refresh/updating interface
@@ -340,14 +353,17 @@ class TidyCity:
 
         self.dlg.inputPolygonLayer.clear()
         self.dlg.inputPolygonLayerClass.clear()
+        self.dlg.inputPolygonLayerLayout.clear()
 
         
         for layer in layers:
             self.dlg.inputPolygonLayer.addItem(layer.name(),layer)
             self.dlg.inputPolygonLayerClass.addItem(layer.name(),layer)
+            self.dlg.inputPolygonLayerLayout.addItem(layer.name(),layer)
         #Refresh the dropbox with attribute list    
-        self.refreshAttributeDropBox()
+        self.updatePolygonLayer()
         self.updatePolygonLayerClass()
+        self.updateLayoutLayer()
         
     """
     
@@ -474,13 +490,54 @@ class TidyCity:
         if renderer is not None:
             vectorLayer.setRenderer(renderer)
         
-        vectorLayer.triggerRepaint() 
+        vectorLayer.triggerRepaint()
+        
+    """
+    
+    Section 3
+    
+    """    
+    def updateLayoutLayer(self):
+        self.updateIDClassification()
+        self.updateSecondaryRanking()
+    
+    
+    def updateIDClassification(self):
+        layers = QgsProject.instance().mapLayers().values()
+        self.dlg.classificationAttributeLayout.clear()        
+        
+        selectedInputLayerIndex = self.dlg.inputPolygonLayerLayout.currentIndex()
+        
+        if selectedInputLayerIndex > -1 :
+            #Getting the selected layer 
+            selectedInputLayer = self.dlg.inputPolygonLayerLayout.itemData(selectedInputLayerIndex)
+            
+            count = selectedInputLayer.featureCount();
 
+            for a in selectedInputLayer.fields():
+                if a.isNumeric():
+                    self.dlg.classificationAttributeLayout.addItem(a.displayName(),a)
+        
+    def updateSecondaryRanking(self):    
+        layers = QgsProject.instance().mapLayers().values()
+        self.dlg.inputSecondaryAttributeLayout.clear()        
+        
+        selectedInputLayerIndex = self.dlg.inputPolygonLayerLayout.currentIndex()
+        
+        if selectedInputLayerIndex > -1 :
+            #Getting the selected layer 
+            selectedInputLayer = self.dlg.inputPolygonLayerLayout.itemData(selectedInputLayerIndex)
+            
+            count = selectedInputLayer.featureCount();
+
+            for a in selectedInputLayer.fields():
+                if a.isNumeric():
+                    self.dlg.inputSecondaryAttributeLayout.addItem(a.displayName(),a)            
 
     """
     
     
-    Execution interractions
+    Execution phase 1 : calculation
     
     """    
     
@@ -499,11 +556,29 @@ class TidyCity:
         vlOut = calculate(layername, selectedInputLayer,intputIDChoiceValue);
         QgsMessageLog.logMessage("Adding layer to map", "Tidy City", Qgis.Info)
         QgsProject.instance().addMapLayer(vlOut)
+        
+         #Refresh after processing
+         
+         #Updating all layers as a new layer is added
         self.updateDropBoxes()
-        self.updatePolygonLayerClass()
+        
+        #Selection of new layer in classificaion menue
         self.selectItem(self.dlg.inputPolygonLayerClass,vlOut.name())
+        
+        #Updateing classificaion content
+        self.updatePolygonLayerClass()
         self.selectItem(self.dlg.intputIDChoiceClassif, intputIDChoiceValue)
         self.selectItem(self.dlg.inputPolygonLayer,selectedInputLayer.name())
+    
+    
+    
+    """
+    
+    
+    Execution phase 2 : classification
+    
+    """    
+    
     
     def processClassification(self):
         selectedInputLayerIndex = self.dlg.inputPolygonLayerClass.currentIndex()
@@ -533,6 +608,37 @@ class TidyCity:
         QgsMessageLog.logMessage("Adding layer to map", "Tidy City", Qgis.Info)
         QgsProject.instance().addMapLayer(layerClassified)
         self.categorizedColor(layerClassified, attributeClass)
+        
+        #Refresh after processing
+        
+         #Updating all layers as a new layer is added
+        self.updateDropBoxes()
+        
+        #Selection of new layer in classificaion menue
+        self.selectItem(self.dlg.inputPolygonLayerLayout,layerClassified.name())
+        
+        #Updateing classificaion content
+        self.updatePolygonLayerClass()
+        self.updateLayoutLayer()
+        self.selectItem(self.dlg.classificationAttributeLayout, attributeClass)
+        self.selectItem(self.dlg.inputSecondaryAttributeLayout,"area")
+        
+    """
+
+    Execution phase 3 : layout
+    
+    """  
+    
+    
+    
+    
+        
+    """
+    
+    
+    Util functions
+    
+    """  
 
     def selectItem(self, dialog, text):
         for i in range(0,dialog.count()):
