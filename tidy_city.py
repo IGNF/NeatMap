@@ -7,8 +7,8 @@
                               -------------------
         begin                : 2016-11-30
         git sha              : $Format:%H$
-        copyright            : (C) 2016 by IGN
-        email                : julien.perret@gmail.com
+        copyright            : (C) 2016 - 2018 by IGN
+        email                : julien.perret@gmail.com; mickael.brasebin@ign.fr
  ***************************************************************************/
 
 /***************************************************************************
@@ -20,29 +20,30 @@
  *                                                                         *
  ***************************************************************************/
 """
+import os.path
+import math
+from random import randrange
+
 from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QVariant, Qt, pyqtSlot
 from PyQt5.QtGui import QIcon, QTransform
 from PyQt5.QtWidgets import QAction, QProgressBar, QCheckBox, QFrame, QVBoxLayout
-from .indicatorCalculation import *
-from .classification import *
 from .resources import *
-# Initialize Qt resources from file resources.py
-#import resources
-# Import the code for the dialog
-from .tidy_city_dialog import TidyCityDialog
-import os.path
-import math
+
 from qgis.core import *
 from qgis.gui import *
 
-from random import randrange
+#Internal imports
+from .indicatorCalculation import *
+from .classification import *
+from .tidy_city_dialog import TidyCityDialog
+
+
+
+
+
 
 class TidyCity:
     """QGIS Plugin Implementation."""
-
-    """
-    Initialisation du plugin.
-    """
 
     def __init__(self, iface):
         """Constructor.
@@ -193,27 +194,18 @@ class TidyCity:
         # remove the toolbar
         del self.toolbar
 
-    #def select_output_file(self):
-        #filename = QFileDialog.getSaveFileName(self.dlg, "Select output file ","", '*.shp')
-        #self.dlg.fileLineEdit.setText(filename)
-
-    #def toggle_save(self):
-        #self.save = self.dlg.saveCheckBox.isChecked()
-        #self.dlg.fileLineEdit.setEnabled(self.save)
-        #self.dlg.fileButton.setEnabled(self.save)
     """
     Fonction run.
     """
 
     def run(self):
-        """Run method that performs all the real work"""
+        #Run method that performs all the real work
         self.prepareGUI()
         # show the dialog
         self.dlg.show()
         
         # Run the dialog event loop
         result = self.dlg.exec_()
-
 
         return 
         # Calcul de y_new (selon la taille) :
@@ -360,7 +352,7 @@ class TidyCity:
             self.dlg.inputPolygonLayer.addItem(layer.name(),layer)
             self.dlg.inputPolygonLayerClass.addItem(layer.name(),layer)
             self.dlg.inputPolygonLayerLayout.addItem(layer.name(),layer)
-        #Refresh the dropbox with attribute list    
+        #Refresh the dropboxes that list attributes 
         self.updatePolygonLayer()
         self.updatePolygonLayerClass()
         self.updateLayoutLayer()
@@ -407,7 +399,7 @@ class TidyCity:
         self.refreshDropDownLayerPanel()
         self.refreshAttributeDropBoxClassif()
 
-        #Refresh the ID attribute list from indicator calculation step
+    #Refresh the ID attribute list from indicator calculation step
     def refreshAttributeDropBoxClassif(self):  
         #Listing layers  
         layers = QgsProject.instance().mapLayers().values()
@@ -428,7 +420,7 @@ class TidyCity:
     
     
 
-                    
+    # Refresh the panel with the checkbox list                
     def refreshDropDownLayerPanel(self):
         layout =  self.dlg.scrollArea.widget().layout()
         #Cleaning layout
@@ -455,6 +447,7 @@ class TidyCity:
                 if (a.isNumeric()) :
                     checkBox = QCheckBox(a.displayName())
                     layout.addWidget(checkBox)
+                    checkBox.setChecked(True)
 
 
     def categorizedColor(self, vectorLayer, classAttNam):
