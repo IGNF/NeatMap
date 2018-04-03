@@ -11,12 +11,14 @@ from qgis.core import *
 from PyQt5.QtCore import QVariant
 from TidyCity.indicatorCalculation import *
 from TidyCity.classification import *
+from TidyCity.square_packing import *
 
 
 input_dir = "/home/mbrasebin/Documents/Donnees/Test/StageJimmy/"
 output_dir = "/home/mbrasebin/Documents/Donnees/temp/"
 
 fid_atribute = "fid"
+
 layerName = "bob"
 
 # supply path to qgis install location
@@ -34,8 +36,12 @@ layer_polygons = QgsVectorLayer(os.path.join(input_dir,'extract.shp'), 'polygons
 layerOut = calculate(layerName,layer_polygons,fid_atribute);
 #Determining the attribute to use for the classification
 attributes = ["area", "elongation" , "compact."]
-#Applying the classification
-layerClassified = kmeans(layerOut, attributes, 3, layerName, "class", fid_atribute)
+#Output classification attribute
+classAttribute = "class"
+#Step 2 : Applying the classification
+layerClassified = kmeans(layerOut, attributes, 3, layerName, classAttribute, fid_atribute)
+#Step 3 ! Applying a naive layout
+newLayoutLayer = naive_layout(layerClassified, classAttribute , "area", layerName)
 
 
 error = QgsVectorFileWriter.writeAsVectorFormat(layerOut, os.path.join(output_dir,"indicator.shp"),"utf-8", layerOut.crs(), "ESRI Shapefile")
@@ -55,7 +61,11 @@ if error == QgsVectorFileWriter.NoError:
     print("success!")
 else:
     print(error)
+    
 
+
+crs=QgsCoordinateReferenceSystem("epsg:-1")
+error = QgsVectorFileWriter.writeAsVectorFormat(newLayoutLayer, os.path.join(output_dir,"layout.shp"),"utf-8", crs, "ESRI Shapefile")
 
 
 qgs.exitQgis()

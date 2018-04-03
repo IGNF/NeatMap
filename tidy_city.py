@@ -35,10 +35,24 @@ from qgis.gui import *
 #Internal imports
 from .indicatorCalculation import *
 from .classification import *
+from .square_packing import *
+#GUI import
 from .tidy_city_dialog import TidyCityDialog
 
 
 
+try:
+    import pip
+except:
+    execfile(os.path.join(self.plugin_dir, get_pip.py))
+    import pip
+    # just in case the included version is old
+    pip.main(['install','--upgrade','pip'])
+
+try:
+    import somelibrary
+except:
+    pip.main(['install','-U' , 'scikit-learn'])
 
 
 
@@ -54,6 +68,8 @@ class TidyCity:
         :type iface: QgsInterface
         """
         print("Initialisation")
+        
+
         # Save reference to the QGIS interface
         self.iface = iface
         # initialize plugin directory
@@ -208,105 +224,7 @@ class TidyCity:
         result = self.dlg.exec_()
 
         return 
-        # Calcul de y_new (selon la taille) :
-            
-        level = 0
-        prec_highest_feature = 0
-        # Parcours de tous les groupes
-        for i in range(1,39):
-            highest_feature = 0
-            # Parcours des îlots
-            for h in vl.dataProvider().getFeatures():
-                SMBR_height = h.attributes()[5]
-                # L'entité est-elle membre du groupe en cours ?
-                if h.attributes()[15] == i:
-                    # On récupère la plus haute entité du groupe
-                    if SMBR_height > highest_feature:
-                        highest_feature = SMBR_height
-            
-            # On peut ainsi connaître l'espace à laisser en hauteur entre les 2 groupes successifs
-            level += highest_feature/1.5 + prec_highest_feature/1.5
-            prec_highest_feature = highest_feature
-            
-            for h in vl.dataProvider().getFeatures():
-                if h.attributes()[15] == i:
-                    # Attribution du y correspondant
-                    vl.changeAttributeValue(h.id(), 14, level)
-                                                
-        vl.commitChanges()
-        vl.startEditing()
-        
-        # Calcul de x_new :
-        
 
-        
-        # Rangement suivant la taille des îlots 
-        for i in range(1, 39):
-            liste = []
-            level = 0
-            prec_width = 0
-            width = 0
-            height = 0
-            for j in vl.dataProvider().getFeatures():
-                if j.attributes()[15] == i:
-                    liste += [j.attributes()[5]]
-            liste.sort()
-            k = 0
-            while k in range(1000):
-                for j in vl.dataProvider().getFeatures():
-                    if j.attributes()[15] == i and liste != []:
-                        if j.attributes()[5] == liste[-1]:
-                            liste.pop()
-                            width = j.attributes()[4]
-                            height = j.attributes()[5]
-                            level += width + prec_width + height
-                            vl.changeAttributeValue(j.id(), 13, level)
-                            prec_width = width
-                k += 1
-                                            
-        vl.commitChanges()
-        vl.startEditing()
-        
-        #On range la ville !
-        for g in vl.dataProvider().getFeatures():
-            geom = g.geometry()
-            
-            # On récupère les anciennes et nouvelles coordonnées.
-            x_init = g.attributes()[11]
-            y_init = g.attributes()[12]
-            x_new = g.attributes()[13]
-            y_new = g.attributes()[14]
-                            
-            # Calcul des paramètres du déplacement.
-            dx = x_new - x_init
-            dy = y_new - y_init
-            centre_rota = QgsPointXY(x_new,y_new)
-            if SMBR_angle < 90:
-                angle_rota = 90 - SMBR_angle #en degré
-            else:
-                angle_rota = SMBR_angle - 90
-            
-            # Translation.
-            isTransformOk = geom.translate(dx,dy)
-            if (isTransformOk != 0):
-                return "error"
-            vl.dataProvider().changeGeometryValues({g.id():geom})
-            
-            # Rotation des îlots
-            if SMBR_angle < 90:
-                isRotOk = geom.rotate(angle_rota, centre_rota)
-                if (isRotOk != 0):
-                    return "error"
-                vl.dataProvider().changeGeometryValues({g.id():geom})
-            else:
-                isRotOk = geom.rotate(-angle_rota, centre_rota)
-                if (isRotOk != 0):
-                    return "error"
-                vl.dataProvider().changeGeometryValues({g.id():geom})
-
-        vl.commitChanges()
-
-        self.iface.messageBar().clearWidgets()
 
 	
     """
@@ -315,7 +233,8 @@ class TidyCity:
     def prepareGUI(self):   
         #Button to process calculation
         self.dlg.pushButtonCalculation.clicked.connect(self.processCalculation)
-        self.dlg.pushButtonClassification.clicked.connect(self.processClassification)        
+        self.dlg.pushButtonClassification.clicked.connect(self.processClassification)  
+        self.dlg.pushButtonLayout.clicked.connect(self.processLayout)      
         
         #DropDown are updated when dropdown layer are activated
         self.dlg.inputPolygonLayer.activated.connect(self.updatePolygonLayer)
@@ -621,8 +540,26 @@ class TidyCity:
     Execution phase 3 : layout
     
     """  
-    
-    
+    def processLayout(self):
+        selectedInputLayerIndex = self.dlg.inputPolygonLayerLayout.currentIndex()
+        selectedInputLayer = self.dlg.inputPolygonLayerLayout.itemData(selectedInputLayerIndex)        
+        QgsMessageLog.logMessage("Layer selected : " + selectedInputLayer.name(), "Tidy City", Qgis.Info)
+        
+        intputClassificationAttributeIndex = self.dlg.classificationAttributeLayout.currentIndex()
+        intputClassificationAttribute = self.dlg.classificationAttributeLayout.itemData(intputClassificationAttributeIndex).displayName()
+        QgsMessageLog.logMessage("Classification attribute : " + intputClassificationAttribute, "Tidy City", Qgis.Info)
+        
+        intputClassificationSecondaryAttributeIndex = self.dlg.inputSecondaryAttributeLayout.currentIndex()
+        intputClassificationSecondaryAttribute = self.dlg.inputSecondaryAttributeLayout.itemData(intputClassificationSecondaryAttributeIndex).displayName()
+        QgsMessageLog.logMessage("Secondary classification attribute : " + intputClassificationSecondaryAttribute, "Tidy City", Qgis.Info)
+        
+        layerName = self.dlg.inputLayerNameLayout.text()
+        QgsMessageLog.logMessage("Attribute for classification: " + layerName, "Tidy City", Qgis.Info)   
+        
+        newLayoutLayer = naive_layout(selectedInputLayer, intputClassificationAttribute , intputClassificationSecondaryAttribute, layerName)
+
+        QgsProject.instance().addMapLayer(newLayoutLayer)
+        self.categorizedColor(newLayoutLayer, intputClassificationAttribute)
     
     
         

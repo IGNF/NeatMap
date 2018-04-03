@@ -93,7 +93,7 @@ def export(layer, attributes, layerName, attributeClass, vectorClass, attributeI
         feat.setGeometry(geom)
         feat.initAttributes(len(fields))
 
-        print(vectorClass[count])
+        #print(vectorClass[count])
         feat.setAttribute(0, vectorClass.item(count))
         feat.setAttribute(1, f.attribute(attributeID))
         countAtt = 2
