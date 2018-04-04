@@ -526,7 +526,7 @@ class TidyCity:
     
     """  
     def processLayout(self):
-        selectedInputLayerIndex = self.dlg.comboBoxLayoutMethod.currentIndex()
+        selectedIndexMethod = self.dlg.comboBoxLayoutMethod.currentIndex()
         
         
         
@@ -550,7 +550,7 @@ class TidyCity:
         
         newLayoutLayer = None;
         boundingBoxLayout = None;
-        if selectedInputLayerIndex ==0 :
+        if selectedIndexMethod ==0 :
             newLayoutLayer = naive_layout(selectedInputLayer, intputClassificationAttribute , intputClassificationSecondaryAttribute, layerName)
         else :
           newLayoutLayer, boundingBoxLayout =  advanced_layout(selectedInputLayer, intputClassificationAttribute, intputClassificationSecondaryAttribute, layerName)
