@@ -34,6 +34,10 @@ def calculate(layerName, layerPolygon, idLayerPolygon):
     
     for f in layerPolygon.getFeatures():
         geom = f.geometry()
+        
+        if geom is None:
+            continue
+        
         area = geom.area()
         perimeter = geom.length()
 
@@ -45,7 +49,7 @@ def calculate(layerName, layerPolygon, idLayerPolygon):
         convexity2 = compute_convexity2(area, SMBR_area)
         elongation = compute_elongation(SMBR_height, SMBR_width)
         compactness = compute_compactness(area, perimeter)
-        complexity = len(geom.asPolygon()[0]) - 1
+        complexity = len(geom.asPolygon()) - 1
 
 
 

@@ -41,21 +41,6 @@ from .tidy_city_dialog import TidyCityDialog
 
 
 
-try:
-    import pip
-except:
-    execfile(os.path.join(self.plugin_dir, get_pip.py))
-    import pip
-    # just in case the included version is old
-    pip.main(['install','--upgrade','pip'])
-
-try:
-    import somelibrary
-except:
-    pip.main(['install','-U' , 'scikit-learn'])
-
-
-
 class TidyCity:
     """QGIS Plugin Implementation."""
 
@@ -541,6 +526,10 @@ class TidyCity:
     
     """  
     def processLayout(self):
+        selectedInputLayerIndex = self.dlg.comboBoxLayoutMethod.currentIndex()
+        
+        
+        
         selectedInputLayerIndex = self.dlg.inputPolygonLayerLayout.currentIndex()
         selectedInputLayer = self.dlg.inputPolygonLayerLayout.itemData(selectedInputLayerIndex)        
         QgsMessageLog.logMessage("Layer selected : " + selectedInputLayer.name(), "Tidy City", Qgis.Info)
@@ -556,11 +545,25 @@ class TidyCity:
         layerName = self.dlg.inputLayerNameLayout.text()
         QgsMessageLog.logMessage("Attribute for classification: " + layerName, "Tidy City", Qgis.Info)   
         
-        newLayoutLayer = naive_layout(selectedInputLayer, intputClassificationAttribute , intputClassificationSecondaryAttribute, layerName)
+        
+        
+        
+        newLayoutLayer = None;
+        boundingBoxLayout = None;
+        if selectedInputLayerIndex ==0 :
+            newLayoutLayer = naive_layout(selectedInputLayer, intputClassificationAttribute , intputClassificationSecondaryAttribute, layerName)
+        else :
+          newLayoutLayer, boundingBoxLayout =  advanced_layout(selectedInputLayer, intputClassificationAttribute, intputClassificationSecondaryAttribute, layerName)
+        
+        if not boundingBoxLayout is None:
+            QgsProject.instance().addMapLayer(boundingBoxLayout)
+         
 
         QgsProject.instance().addMapLayer(newLayoutLayer)
         self.categorizedColor(newLayoutLayer, intputClassificationAttribute)
-    
+        
+
+            
     
         
     """

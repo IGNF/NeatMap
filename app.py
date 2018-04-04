@@ -14,7 +14,8 @@ from TidyCity.classification import *
 from TidyCity.square_packing import *
 
 
-input_dir = "/home/mbrasebin/Documents/Donnees/Test/StageJimmy/"
+
+input_dir = "/home/mbrasebin/Documents/Donnees/Test/TidyCity/world/"
 output_dir = "/home/mbrasebin/Documents/Donnees/temp/"
 
 fid_atribute = "fid"
@@ -30,7 +31,7 @@ qgs = QgsApplication([], False)
 # load providers
 qgs.initQgis()
 
-layer_polygons = QgsVectorLayer(os.path.join(input_dir,'extract.shp'), 'polygons', 'ogr')
+layer_polygons = QgsVectorLayer(os.path.join(input_dir,'world.shp'), 'polygons', 'ogr')
 
 #Step 1 : calculating indicator
 layerOut = calculate(layerName,layer_polygons,fid_atribute);
@@ -39,34 +40,31 @@ attributes = ["area", "elongation" , "compact."]
 #Output classification attribute
 classAttribute = "class"
 #Step 2 : Applying the classification
-layerClassified = kmeans(layerOut, attributes, 3, layerName, classAttribute, fid_atribute)
+layerClassified = kmeans(layerOut, attributes, 10, layerName, classAttribute, fid_atribute)
 #Step 3 ! Applying a naive layout
-newLayoutLayer = naive_layout(layerClassified, classAttribute , "area", layerName)
+#Secondary attribute to sort the feature (descending)
+attSecondary = "area"
+newLayoutLayer = naive_layout(layerClassified, classAttribute , attSecondary, layerName)
 
+#Step 3 bis : other layout method (with the bounding boxes to debug the rectangle packing)
+otherLayout, layoutBoundingBox = advanced_layout(layerClassified, classAttribute , attSecondary, layerName)
 
+#Export
+
+#Export features with attributes
 error = QgsVectorFileWriter.writeAsVectorFormat(layerOut, os.path.join(output_dir,"indicator.shp"),"utf-8", layerOut.crs(), "ESRI Shapefile")
 
-
-if error == QgsVectorFileWriter.NoError:
-    print("success!")
-else:
-    print(error)
-
-
-
+#Export features with  classificatino
 error = QgsVectorFileWriter.writeAsVectorFormat(layerClassified, os.path.join(output_dir,"classified.shp"),"utf-8", layerClassified.crs(), "ESRI Shapefile")
 
-
-if error == QgsVectorFileWriter.NoError:
-    print("success!")
-else:
-    print(error)
-    
-
-
+#Export layout
 crs=QgsCoordinateReferenceSystem("epsg:-1")
-error = QgsVectorFileWriter.writeAsVectorFormat(newLayoutLayer, os.path.join(output_dir,"layout.shp"),"utf-8", crs, "ESRI Shapefile")
-
+#Naive layout
+error = QgsVectorFileWriter.writeAsVectorFormat(newLayoutLayer, os.path.join(output_dir,"naiveLayout.shp"),"utf-8", crs, "ESRI Shapefile")
+#Packed layout
+error = QgsVectorFileWriter.writeAsVectorFormat(otherLayout, os.path.join(output_dir,"otherLayout.shp"),"utf-8", crs, "ESRI Shapefile")
+#Bounding boxes used for pack layout production
+error = QgsVectorFileWriter.writeAsVectorFormat(layoutBoundingBox, os.path.join(output_dir,"boundingBox.shp"),"utf-8", crs, "ESRI Shapefile")
 
 qgs.exitQgis()
 

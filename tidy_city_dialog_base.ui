@@ -523,6 +523,26 @@
      <string>Ok</string>
     </property>
    </widget>
+   <widget class="QComboBox" name="comboBoxLayoutMethod">
+    <property name="geometry">
+     <rect>
+      <x>264</x>
+      <y>0</y>
+      <width>231</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>1 line per class</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Chazelle packing method</string>
+     </property>
+    </item>
+   </widget>
   </widget>
   <widget class="QPushButton" name="pushButtonClassification">
    <property name="geometry">

@@ -3,6 +3,22 @@ from qgis.core import *
 
 import matplotlib.pyplot as plt
 import numpy as np
+
+try:
+    import pip
+except:
+    execfile(os.path.join(self.plugin_dir, get_pip.py))
+    import pip
+    # just in case the included version is old
+    pip.main(['install','--upgrade','pip'])
+
+try:
+    from sklearn import datasets
+except:
+    pip.main(['install','-U' , 'scikit-learn'])
+    
+    
+    
 from sklearn import datasets
 from sklearn import preprocessing
 from sklearn.cluster import KMeans
