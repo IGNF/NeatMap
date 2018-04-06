@@ -49,7 +49,7 @@ def calculate(layerName, layerPolygon, idLayerPolygon):
         convexity2 = compute_convexity2(area, SMBR_area)
         elongation = compute_elongation(SMBR_height, SMBR_width)
         compactness = compute_compactness(area, perimeter)
-        complexity = len(geom.asPolygon()) - 1
+        complexity = compute_complexity(geom)
 
 
 

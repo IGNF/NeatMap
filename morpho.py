@@ -126,6 +126,22 @@ def compute_compactness(area, perimeter):
     """
     return 4 * math.pi * area / (perimeter * perimeter)
 
+
+def complexityPolygon(geom):
+    n = len(geom[0])
+    return n-1
+
+def compute_complexity(geom):
+    if geom.isMultipart(): # new part for multipolylines
+        multiP = geom.asMultiPolygon()
+        count = 0
+        for v in multiP:
+            count = count + complexityPolygon(v)
+        return count
+    else:
+        
+        return complexityPolygon(geom)
+
 def compute_convexity1(geom, area):
     """
     Calcul de la convexité selon l'enveloppe convexe.
