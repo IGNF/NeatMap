@@ -39,13 +39,20 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>325</width>
-        <height>724</height>
+        <width>339</width>
+        <height>761</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_4">
        <item row="0" column="0">
         <layout class="QVBoxLayout" name="verticalLayout_4">
+         <item>
+          <widget class="QCheckBox" name="copyAtt">
+           <property name="text">
+            <string>Copy attributes between two steps</string>
+           </property>
+          </widget>
+         </item>
          <item>
           <widget class="QGroupBox" name="groupBox">
            <property name="title">
@@ -144,14 +151,6 @@
              </widget>
             </item>
            </layout>
-           <zorder>layoutWidget</zorder>
-           <zorder>layoutWidget_2</zorder>
-           <zorder>layoutWidget_4</zorder>
-           <zorder>groupBox_2</zorder>
-           <zorder>line_2</zorder>
-           <zorder>groupBox_3</zorder>
-           <zorder>groupBox_2</zorder>
-           <zorder>pushButtonCalculation</zorder>
           </widget>
          </item>
          <item>
@@ -170,8 +169,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>279</width>
-                 <height>69</height>
+                 <width>291</width>
+                 <height>73</height>
                 </rect>
                </property>
               </widget>
@@ -443,10 +442,6 @@
         </layout>
        </item>
       </layout>
-      <zorder>groupBox</zorder>
-      <zorder>scrollArea</zorder>
-      <zorder>groupBox_2</zorder>
-      <zorder>groupBox_3</zorder>
      </widget>
     </widget>
    </item>
