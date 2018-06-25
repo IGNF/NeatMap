@@ -449,8 +449,12 @@ class TidyCity:
         intputIDChoiceIndex = self.dlg.intputIDChoice.currentIndex()
         intputIDChoiceValue = self.dlg.intputIDChoice.itemData(intputIDChoiceIndex).displayName()
         QgsMessageLog.logMessage("ID value : " + intputIDChoiceValue, "Tidy City", Qgis.Info)     
-        QgsMessageLog.logMessage("Calculating indicator on layer : " + layername, "Tidy City", Qgis.Info)            
-        vlOut = calculate(layername, selectedInputLayer,intputIDChoiceValue);
+        copyAttribute = self.dlg.copyAtt.isChecked()
+        QgsMessageLog.logMessage("Copy attribute : " + str(copyAttribute), "Tidy City", Qgis.Info)          
+        QgsMessageLog.logMessage("Calculating indicator on layer : " + layername, "Tidy City", Qgis.Info)  
+                        
+        vlOut = calculate(layername, selectedInputLayer,intputIDChoiceValue, copyAttribute);
+        
         QgsMessageLog.logMessage("Adding layer to map", "Tidy City", Qgis.Info)
         QgsProject.instance().addMapLayer(vlOut)
         
@@ -496,12 +500,14 @@ class TidyCity:
         intputIDChoiceValue = self.dlg.intputIDChoiceClassif.itemData(intputIDChoiceIndex).displayName()
         QgsMessageLog.logMessage("ID value : " + intputIDChoiceValue, "Tidy City", Qgis.Info)
         
+        copyAttribute = self.dlg.copyAtt.isChecked()
+        QgsMessageLog.logMessage("Copy attribute : " + str(copyAttribute), "Tidy City", Qgis.Info) 
         
         attributeClass = self.dlg.lineEditAttClass.text()
         
         QgsMessageLog.logMessage("Attribute for classification: " + attributeClass, "Tidy City", Qgis.Info)               
         
-        layerClassified = kmeans(selectedInputLayer, attributes, numberOfClasses, layername, attributeClass, intputIDChoiceValue)
+        layerClassified = kmeans(selectedInputLayer, attributes, numberOfClasses, layername, attributeClass, intputIDChoiceValue, copyAttribute)
         QgsMessageLog.logMessage("Adding layer to map", "Tidy City", Qgis.Info)
         QgsProject.instance().addMapLayer(layerClassified)
         self.categorizedColor(layerClassified, attributeClass)
@@ -528,7 +534,8 @@ class TidyCity:
     def processLayout(self):
         selectedIndexMethod = self.dlg.comboBoxLayoutMethod.currentIndex()
         
-        
+        copyAttribute = self.dlg.copyAtt.isChecked()
+        QgsMessageLog.logMessage("Copy attribute : " + str(copyAttribute), "Tidy City", Qgis.Info) 
         
         selectedInputLayerIndex = self.dlg.inputPolygonLayerLayout.currentIndex()
         selectedInputLayer = self.dlg.inputPolygonLayerLayout.itemData(selectedInputLayerIndex)        
@@ -546,14 +553,15 @@ class TidyCity:
         QgsMessageLog.logMessage("Attribute for classification: " + layerName, "Tidy City", Qgis.Info)   
         
         
-        
+        copyAttribute = self.dlg.copyAtt.isChecked()
+        QgsMessageLog.logMessage("Copy attribute : " + str(copyAttribute), "Tidy City", Qgis.Info) 
         
         newLayoutLayer = None;
         boundingBoxLayout = None;
         if selectedIndexMethod ==0 :
-            newLayoutLayer = naive_layout(selectedInputLayer, intputClassificationAttribute , intputClassificationSecondaryAttribute, layerName)
+            newLayoutLayer = naive_layout(selectedInputLayer, intputClassificationAttribute , intputClassificationSecondaryAttribute, layerName, copyAttribute)
         else :
-          newLayoutLayer, boundingBoxLayout =  advanced_layout(selectedInputLayer, intputClassificationAttribute, intputClassificationSecondaryAttribute, layerName)
+          newLayoutLayer, boundingBoxLayout =  advanced_layout(selectedInputLayer, intputClassificationAttribute, intputClassificationSecondaryAttribute, layerName, copyAttribute)
         
         if not boundingBoxLayout is None:
             QgsProject.instance().addMapLayer(boundingBoxLayout)

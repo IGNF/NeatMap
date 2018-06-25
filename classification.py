@@ -32,8 +32,8 @@ Classification code only k-means for the moment
 """
 
 
-# Transforing classification to vector layer (layer : input layer, attributes : attribute used for classification, layerName ; nae of the layer, attributeClasse : attribute of the classification,  attributeID : name of attribute ID)
-def kmeans(layer, attributes, nbClasses, layerName, attributeClass, attributeID):  
+# Transforing classification to vector layer (layer : input layer, attributes : attribute used for classification, layerName ; nae of the layer, attributeClasse : attribute of the classification,  attributeID : name of attribute ID) , copyAtt indicate if other attributes are copied in output
+def kmeans(layer, attributes, nbClasses, layerName, attributeClass, attributeID, copyAtt):  
     # Load in the `digits` data
     dataset = prepareDataset(layer, attributes)
     # Defining k-means
@@ -45,7 +45,7 @@ def kmeans(layer, attributes, nbClasses, layerName, attributeClass, attributeID)
     # Association between points and nearest centers
     k_means_labels = pairwise_distances_argmin(dataset.data, k_means_cluster_centers)
     # Transforming classification to VectorLayer
-    return export(layer, attributes, layerName, attributeClass, k_means_labels, attributeID)
+    return export(layer, attributes, layerName, attributeClass, k_means_labels, attributeID, copyAtt)
 
 """
 DataManagement
@@ -84,16 +84,28 @@ def prepareDataset(layer, attributes):
 Exporting a vector layer from input dataset and classification
 """
 # Transforing classification to vector layer (layer : input layer, attributes : attribute used for classification, layerName ; nae of the layer, attributeClasse : attribute of the classification, vectorClass : the vector with corresponding class, attributeID : name of attribute ID)
-def export(layer, attributes, layerName, attributeClass, vectorClass, attributeID):
+def export(layer, attributes, layerName, attributeClass, vectorClass, attributeID, copyAtt):
     vl = QgsVectorLayer("Polygon", layerName, "memory")
     pr = vl.dataProvider()
     vl.startEditing()
+    
+    
     fields = [QgsField(attributeClass, QVariant.Int)]
     
-    fields.append(layer.fields().field(attributeID))
     
-    for a in attributes:
-            fields.append(QgsField(a, QVariant.Double, "Real", 10, 3))
+    
+    
+    if copyAtt :
+        #If copy is activated we copy all attributes
+        for fieldTemp in layer.fields():
+            fields.append(fieldTemp)
+    else :
+        #if not we only keeps the fild id and necessary to classification
+        fields.append(layer.fields().field(attributeID))
+        for a in attributes:
+                fields.append(QgsField(a, QVariant.Double, "Real", 10, 3))
+            
+        
     
     pr.addAttributes(fields)
     vl.updateFields()
@@ -111,11 +123,23 @@ def export(layer, attributes, layerName, attributeClass, vectorClass, attributeI
 
         #print(vectorClass[count])
         feat.setAttribute(0, vectorClass.item(count))
-        feat.setAttribute(1, f.attribute(attributeID))
-        countAtt = 2
-        for a in attributes:
-            feat.setAttribute(countAtt, f.attribute(a))
-            countAtt = countAtt + 1
+        
+
+        countAtt = 1
+        
+        if copyAtt:
+            countTemp = 0;
+            for field in layer.fields() :
+                feat.setAttribute( countAtt, f.attribute(countTemp))
+                countTemp+=1
+                countAtt+=1
+                
+        else:
+            feat.setAttribute(1, f.attribute(attributeID))
+            countAtt+=1
+            for a in attributes:
+                feat.setAttribute(countAtt, f.attribute(a))
+                countAtt = countAtt + 1
         
         count = count + 1
         featureList.append(feat)

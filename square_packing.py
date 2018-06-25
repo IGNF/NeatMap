@@ -24,14 +24,14 @@ Layout methods
 
 
 #Basic method : 1 line by class
-def naive_layout(vectorLayer, attributeClass, secondaryRankingAttribute, outputLayerName):
+def naive_layout(vectorLayer, attributeClass, secondaryRankingAttribute, outputLayerName, copyAtt):
     #Transforming feature to rectangles on a same line
-    boundingBox_tuples = initialise_layout(vectorLayer, attributeClass, secondaryRankingAttribute, outputLayerName)
+    boundingBox_tuples, fields = initialise_layout(vectorLayer, attributeClass, secondaryRankingAttribute, outputLayerName, copyAtt)
     #Initializing new layer
     vl = QgsVectorLayer("Polygon", outputLayerName, "memory")
     pr = vl.dataProvider()
     #Getting fields for the layer (the feature are initialized)
-    fields = [vectorLayer.fields().field(attributeClass), vectorLayer.fields().field(secondaryRankingAttribute)]
+    #fields = boundingBox_tuples[0][0].fields()
     #Update
     pr.addAttributes(fields)
     vl.updateFields()
@@ -58,16 +58,16 @@ def naive_layout(vectorLayer, attributeClass, secondaryRankingAttribute, outputL
     return vl
     
 
-def advanced_layout(vectorLayer, attributeClass, secondaryRankingAttribute, outputLayerName):
+def advanced_layout(vectorLayer, attributeClass, secondaryRankingAttribute, outputLayerName, copyAtt):
     #1- We generate a basic layout with no placement (1 bounding box = 1 class)
-    boundingBox_tuples =  initialise_layout(vectorLayer, attributeClass, secondaryRankingAttribute, outputLayerName)
+    boundingBox_tuples, fields =  initialise_layout(vectorLayer, attributeClass, secondaryRankingAttribute, outputLayerName, copyAtt)
     #2 - Determining the possible bounding boxes ordered by area
     minimumBoundingBoxes = minimumBoundingBox(boundingBox_tuples)
     #2 - Packing the bounding box into the minimumBounding box with smallest area
     rectngle_tuple = pack(boundingBox_tuples, minimumBoundingBoxes)
     # can be transformed into VectorLayer with => fromPlaceRectangleToVectorLayer(rectngle_tuple)
     #3 - Displacing the geographic feature 
-    vl = movingFeature(rectngle_tuple, vectorLayer, attributeClass, secondaryRankingAttribute, outputLayerName )
+    vl = movingFeature(rectngle_tuple, vectorLayer, attributeClass, secondaryRankingAttribute, outputLayerName, fields)
     return vl,  fromPlaceRectangleToVectorLayer(rectngle_tuple)
 
 
@@ -79,11 +79,22 @@ Secondary methods
 #Basic method that generates the bounding box for the different classes
 #Rotate the feature according to their orientation
 #
-def initialise_layout(vectorLayer, attributeClass, secondaryRankingAttribute, outputLayerName):
+def initialise_layout(vectorLayer, attributeClass, secondaryRankingAttribute, outputLayerName, copyAtt):
     # provide file name index and field's unique values
     fni = vectorLayer.fields().indexFromName(attributeClass)
     unique_values = vectorLayer.uniqueValues(fni)
     fields = [vectorLayer.fields().field(attributeClass), vectorLayer.fields().field(secondaryRankingAttribute)]
+    
+    
+    tempAttributeList = []
+    if copyAtt :
+        tempAttributeList = vectorLayer.fields()
+        for fTemp in tempAttributeList :
+            if (fTemp.name() != secondaryRankingAttribute) and (fTemp.name() != attributeClass):
+                fields.append(fTemp)
+
+        
+  
 
     #That tuples contain bounding boxes
     #(1) a feature list for a given class 
@@ -141,6 +152,17 @@ def initialise_layout(vectorLayer, attributeClass, secondaryRankingAttribute, ou
             new_feature.initAttributes(len(fields))
             new_feature.setAttribute(0, featCurrent.attribute(attributeClass))
             new_feature.setAttribute(1, featCurrent.attribute(secondaryRankingAttribute))
+            
+            
+            if copyAtt :
+                countAt = 2;
+                countTemp = 0;
+                for fTemp in tempAttributeList :
+                    if (fTemp.name() != secondaryRankingAttribute) and (fTemp.name() != attributeClass):
+                        new_feature.setAttribute(countAt, featCurrent.attribute(countTemp))
+                        countAt = countAt+1
+                    countTemp= countTemp +1
+            
 
             featureList.append(new_feature)
             
@@ -169,7 +191,7 @@ def initialise_layout(vectorLayer, attributeClass, secondaryRankingAttribute, ou
         #The rectangle is added to the tuple
         boundingBox_tuples.append([featureList, x_current, heighestBox, x_current * heighestBox])
 
-    return boundingBox_tuples
+    return boundingBox_tuples, fields
 
 #Determine all the candidate bounding boxes sorted by area
 def minimumBoundingBox(boundingBox_tuple):
@@ -320,12 +342,11 @@ def determineLayout(boundingBox_tuples, boundingBox):
 
 
 
-def  movingFeature(rectngle_tuple,  vectorLayer,  attributeClass, secondaryRankingAttribute, outputLayerName):
+def  movingFeature(rectngle_tuple,  vectorLayer,  attributeClass, secondaryRankingAttribute, outputLayerName, fields):
     #Initializing new layer
     vl = QgsVectorLayer("Polygon", outputLayerName, "memory")
     pr = vl.dataProvider()
-    #Getting fields for the layer (the feature are initialized)
-    fields = [vectorLayer.fields().field(attributeClass), vectorLayer.fields().field(secondaryRankingAttribute)]
+    
     #Update
     pr.addAttributes(fields)
     vl.updateFields()
