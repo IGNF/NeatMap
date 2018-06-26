@@ -25,14 +25,18 @@ Furthermore, we are interested in every feedbacks about this library if you find
 
 Plugin installation
 ---------------------
+The only requirement is to get QGIS 3.0 or later installed. You can download it from [QGIS official website](https://www.qgis.org/fr/site/).
+
 Currently the plugin is not on QGIS repositories, you have to install it manually. You have to download  the [automatically generated zip file](https://github.com/julienperret/TidyCity/archive/master.zip) and to unzip it in the plugins folder (https://gis.stackexchange.com/questions/274311/qgis-3-plugin-folder-location).
 
+In QGIS, in the "Extenion" menu > "Install Extension" option, you have just to activate the "TidyCity" plugin.
 
-
-
+NOTE : if the plugin is mising, you may have to allow experimental plugins, in the parameter menu.
 
 Tutorial for plugin use
 ---------------------
+
+
 
 
 Standalone use of the plugin

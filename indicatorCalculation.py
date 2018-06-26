@@ -8,7 +8,8 @@ import sys
 
 
 
-
+#Calculate a new layer (layerName) from a layer with polygonal features (layerPolygon) with id (idLayerPolygon) and indicates if attribute from initial layer are copied
+#Indicator are stored in morpho.py
 def calculate(layerName, layerPolygon, idLayerPolygon, copyAttribute):
     # A new layer is created
     vl = QgsVectorLayer("Polygon", layerName, "memory")
@@ -27,7 +28,7 @@ def calculate(layerName, layerPolygon, idLayerPolygon, copyAttribute):
                     QgsField("area/perim", QVariant.Double, "Real",10, 3),
                     QgsField("complexity", QVariant.Double, "Real",10, 3)]
     
-    print("fields :" + str(len(fields)))
+    # print("fields :" + str(len(fields)))
     
     
     #We copy the intial fields except the fid
@@ -39,7 +40,7 @@ def calculate(layerName, layerPolygon, idLayerPolygon, copyAttribute):
                 fields.append(f)
                 #print(f.name())
      
-    print("fields :" + str(len(fields)))
+    # print("fields :" + str(len(fields)))
     
     # (const QString &name=QString(), QVariant::Type type=QVariant::Invalid, const QString &typeName=QString(), int len=0, int prec=0, const QString &comment=QString(), QVariant::Type subType=QVariant::Invalid)
     pr.addAttributes( fields )
@@ -114,4 +115,4 @@ def calculate(layerName, layerPolygon, idLayerPolygon, copyAttribute):
     vl.commitChanges()
     vl.updateFields()
     vl.endEditCommand()
-    return vl       
+    return vl

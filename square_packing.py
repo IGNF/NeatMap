@@ -39,6 +39,7 @@ def naive_layout(vectorLayer, attributeClass, secondaryRankingAttribute, outputL
     featureList = []
     #We only apply a y translation on the rectangle
     current_y = 0
+
     #For each rectangle
     for boundingBox in boundingBox_tuples:
         #We get the list of corresponding feature
@@ -50,7 +51,8 @@ def naive_layout(vectorLayer, attributeClass, secondaryRankingAttribute, outputL
             feature.setGeometry(geometry)
             featureList.append(feature)
         current_y = current_y + boundingBox[2]
-        
+    
+           
     #Commit changes
     pr.addFeatures(featureList)
     vl.commitChanges()
@@ -63,14 +65,23 @@ def advanced_layout(vectorLayer, attributeClass, secondaryRankingAttribute, outp
     boundingBox_tuples, fields =  initialise_layout(vectorLayer, attributeClass, secondaryRankingAttribute, outputLayerName, copyAtt)
     #2 - Determining the possible bounding boxes ordered by area
     minimumBoundingBoxes = minimumBoundingBox(boundingBox_tuples)
-    #2 - Packing the bounding box into the minimumBounding box with smallest area
-    rectngle_tuple = pack(boundingBox_tuples, minimumBoundingBoxes)
+    #2 - Packing the bounding box into the minimumBounding box b with smallest area
+    rectngle_tuple, b = pack(boundingBox_tuples, minimumBoundingBoxes)
+    
+    #3 - Extend pack rectangles
+    extendRectangleTuple(rectngle_tuple, b)
+    
     # can be transformed into VectorLayer with => fromPlaceRectangleToVectorLayer(rectngle_tuple)
     #3 - Displacing the geographic feature 
     vl = movingFeature(rectngle_tuple, vectorLayer, attributeClass, secondaryRankingAttribute, outputLayerName, fields)
     return vl,  fromPlaceRectangleToVectorLayer(rectngle_tuple)
 
 
+
+
+
+#def equal(rectangle1, rectangle2):
+ #   return (rectangle1[1] == rectangle2[1]) and (rectangle1[2] == rectangle2[2]) and (rectangle1[3] == rectangle2[3]) and (rectangle1[4] == rectangle2[4]) 
 """
 Secondary methods
 """
@@ -165,27 +176,6 @@ def initialise_layout(vectorLayer, attributeClass, secondaryRankingAttribute, ou
             
 
             featureList.append(new_feature)
-            
-        """
-        if x_current < heighestBox :
-            x_current, heighestBox = heighestBox, x_current
-            
-            
-            #If there is a rotation features must move
-            for featCurrent in featureList :
-                geom = featCurrent.geometry()
-                #We determine box of the current geometry
-                minBounds, area, angle, width, height = compute_SMBR(geom)
-                #The centroid of the box
-                centroid = minBounds.centroid().asPoint()
-                geom.rotate( 90, centroid)
-                #We inverse x et y
-                dx = centroid.y() - centroid.x()
-                dy = centroid.x() - centroid.y()
-                geom.translate(dx,dy)
-                featCurrent.setGeometry(geom)
-             
-            """
         
         
         #The rectangle is added to the tuple
@@ -274,7 +264,7 @@ def pack(boundingBox_tuples, boundingBoxes):
             if not layout is None:
                 break
 
-    return layout
+    return layout, b
     
 #Generate a layout relatively to a bounding box
 #Placement is organized from widest  
@@ -357,7 +347,7 @@ def  movingFeature(rectngle_tuple,  vectorLayer,  attributeClass, secondaryRanki
         #The translation is encoding with X,Y
         x = rectangle[1]
         y = rectangle[2] + rectangle[4] /2
-        
+         
         for feature in rectangle[0]:
             geometry = feature.geometry()
             geometry.translate(x,y)
@@ -368,6 +358,90 @@ def  movingFeature(rectngle_tuple,  vectorLayer,  attributeClass, secondaryRanki
     pr.addFeatures(features)
     vl.commitChanges()
     return vl
+
+
+
+#Method to extend the rectangle in width as much as possible and displacing the features inside
+#It requires a rectngle_tuple and the bounding box of the layout
+def extendRectangleTuple(rectngle_tuple, b):
+    #Results are stored into the intial rectngle_tuple
+    
+    #This is a discrete method
+    widthStep = b[1]/1000.0;
+    
+    
+    nbRectangle = len(rectngle_tuple)
+    #Iteration on each rectangle
+    for i in range(0, nbRectangle):
+        
+        #We remove a current rectangle from the list
+        currentRectangle = rectngle_tuple[i]
+        rectngle_tuple.remove(currentRectangle)
+        
+        #We store the initial width and the width after modifications
+        initialWidth = currentRectangle[3]
+        currentWidth = initialWidth
+        #Boucle until : the rectangle cannot be placed in the bounding box or if it inteersects an other rectangle
+        conditionCheck = True
+        while conditionCheck :
+            #We widthen the current rectangle
+            currentRectangle = widthenRectangle(currentRectangle, widthStep);
+            currentWidth = currentWidth + widthStep
+            
+            #Does it stay into the initial bounding box ?
+            if not checkIfIsBoundingBox(currentRectangle, b):
+                conditionCheck = False
+                break
+            
+            #Does it intersects another rectangle from the list ?
+            for placeRectangle in rectngle_tuple:
+                intersected = testIntersection(currentRectangle, placeRectangle)
+                
+                if intersected :
+                    conditionCheck = False
+                    break
+        
+        #We went a step further we decrease the width
+        currentRectangle  = widthenRectangle(currentRectangle, - widthStep)
+        currentWidth = currentWidth - widthStep
+        #We move the features inside the rectangle
+        extendFeatureInRectangle(currentRectangle, currentWidth, initialWidth)
+        #We re-insert the rectangle into the list
+        rectngle_tuple.insert(i, currentRectangle)
+    return
+
+#Code to widthen a rectangle
+def widthenRectangle(rectangle, step):
+    return (rectangle[0],rectangle[1],rectangle[2],rectangle[3]+step,rectangle[4])
+
+#Code to move the feature inside a rectangle
+def extendFeatureInRectangle(currentRectangle,currentWidth, initialWidth ):
+    #NO width change we can exist
+    if currentWidth == initialWidth:
+        return currentRectangle;
+    #We get the features inside a rectangle
+    features = currentRectangle[0]
+    
+    nbFeatures = len(features)
+    #The x move for each featuer from a previous one
+    deltaX = (currentWidth - initialWidth) / (nbFeatures+1)
+    
+    #We applied a translation i * deltaX
+    for i in range(0, nbFeatures):
+        currentFeature = features[i]
+        features.remove(currentFeature)
+        
+        geometry = currentFeature.geometry()
+        geometry.translate((i + 1) * deltaX,0)
+        currentFeature.setGeometry(geometry)
+        
+            
+        features.insert(i, currentFeature)
+        
+    #We return the new rectangle
+    return  (features,currentRectangle[1],currentRectangle[2],currentRectangle[3],currentRectangle[4]);
+
+
 """
 Utility functions
 """
@@ -455,7 +529,7 @@ def fromPlaceRectangleToVectorLayer(placedRectangle):
             feat = generateBoundingBox(b[1], b[2], b[3], b[4], fields)
             features.append(feat)
             
-    print("Number of features :" + str(len(features)))
+    #print("Number of features :" + str(len(features)))
     pr.addFeatures(features)
     vl.commitChanges()
     return vl
@@ -476,7 +550,7 @@ def fromBoundingBoxToVectorLayer(boundingBox):
             feat = generateBoundingBox(b[0], b[1], b[2])
             features.append(feat)
             
-    print("Number of features :" + str(len(features)))
+    #print("Number of features :" + str(len(features)))
     pr.addFeatures(features)
     vl.commitChanges()
     return vl
