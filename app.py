@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+# (True) => Means that all attributes will be copied#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import sys
@@ -22,7 +22,7 @@ output_dir = "/home/mbrasebin/Documents/Donnees/temp/"
 
 fid_atribute = "fid"
 
-layerName = "bob"
+layerName = "layer"
 
 # supply path to qgis install location
 QgsApplication.setPrefixPath("/usr", True)
@@ -39,6 +39,10 @@ layer_polygons = QgsVectorLayer(os.path.join(input_dir,'world.shp'), 'polygons',
 crs=QgsCoordinateReferenceSystem("epsg:-1")
 
 #Step 1 : calculating indicator
+# (layerName) => The name of the output layer
+# (layer_polygons) => The input layer
+# (fid_atribute) => The name of the fid attribute
+# (True) => Means that all attributes will be copied
 layerOut = calculate(layerName,layer_polygons,fid_atribute, True);
 
 #Export features with attributes
@@ -51,6 +55,13 @@ attributes = ["area", "elongation" , "compact."]
 classAttribute = "class"
 
 #Step 2 : Applying the classification
+# (layerOut) : the input layer (the output from previous step)
+# (attributes) : the list of attributes on which the classificatino will be proceeded
+# (10) : the number of classes
+# (layerName) : the name of the output layer name
+# (classAttribute) : the name of the attribute in which the class will be stored)
+# f(id_atribute) => The name of the fid attribute
+# (True) => Means that all attributes will be copied
 layerClassified = kmeans(layerOut, attributes, 10, layerName, classAttribute, fid_atribute, True)
 
 #Export features with  classificatino
@@ -60,6 +71,12 @@ error = QgsVectorFileWriter.writeAsVectorFormat(layerClassified, os.path.join(ou
 #Step 3 ! Applying a naive layout
 #Secondary attribute to sort the feature (descending)
 attSecondary = "area"
+
+# (layerClassified) : the input layer (the output from previous step)
+# (classAttribute) : the name of the attribute in which the class will be stored)
+# (attSecondary) : the secondary ranking attribute
+# (layerName) : the name of the output layer name
+# (True) => Means that all attributes will be copied
 newLayoutLayer = naive_layout(layerClassified, classAttribute , attSecondary, layerName, True)
 
 #Naive layout
@@ -67,6 +84,11 @@ error = QgsVectorFileWriter.writeAsVectorFormat(newLayoutLayer, os.path.join(out
 
 
 #Step 3 bis : other layout method (with the bounding boxes to debug the rectangle packing)
+# (layerClassified) : the input layer (the output from previous step)
+# (classAttribute) : the name of the attribute in which the class will be stored)
+# (attSecondary) : the secondary ranking attribute
+# (layerName) : the name of the output layer name
+# (True) => Means that all attributes will be copied
 otherLayout, layoutBoundingBox = advanced_layout(layerClassified, classAttribute , attSecondary, layerName, True)
 
 #Bounding boxes used for pack layout production
