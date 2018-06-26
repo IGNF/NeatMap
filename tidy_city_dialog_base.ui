@@ -51,6 +51,9 @@
            <property name="text">
             <string>Copy attributes between two steps</string>
            </property>
+           <property name="checked">
+            <bool>false</bool>
+           </property>
           </widget>
          </item>
          <item>
