@@ -1,19 +1,19 @@
 TidyCity
 ============
 
-TidyCity is a plugin for [QGIS](https://www.qgis.org/fr/site/) that allows the production of "tidy" set of polygon features through : morphological indicators calculation, classification of the polygonal features usin these indicators and the disposition of the features through layout generation methods.
+TidyCity is a plugin for [QGIS](https://www.qgis.org/fr/site/) that allows the production of "tidy" set of polygon features according to their morphology. In order to proceed, three steps are necessary : 1/ morphological indicators calculation, 2/ classification of the polygon features using these indicators and 3/ generation of the disposition of the features.
 
 The project is developed as an Open-Source library based on :
 - [QGIS API V3.0](https://www.qgis.org/fr/site/), for morphological operators and layout generation ;
-- [Scikit learn 0.19.1](http://scikit-learn.org/stable/index.html) :  for the classifications.
+- [Scikit learn 0.19.1](http://scikit-learn.org/stable/index.html) :  for the classification.
 
 
 Introduction
 ---------------------
 
-This research library is developed from a [ENSG](http://www.ensg.eu) student work and continues with [COGIT team](http://recherche.ign.fr/labos/cogit/accueilCOGIT.php) research developments.
+This research library has been initiated during a [ENSG](http://www.ensg.eu) student work and continues with [COGIT team](http://recherche.ign.fr/labos/cogit/accueilCOGIT.php) research developments.
 
-The intial idea was based on the artistic work of [Armel Caron : tidy cities](http://www.armellecaron.fr/works/les-villes-rangees/) and to quetion the ability of automatic algorithms to produce similar layout. The idea is not to produce on-demand art but to asses the expressivity of common morphological indicators to discriminate polygon shapes and  the part of subjectivity in the original artistic productions.
+The initial idea was based on the artistic work of [Armel Caron : tidy cities](http://www.armellecaron.fr/works/les-villes-rangees/) and the aim is to question the ability of automatic algorithms to generate similar layouts. The idea is not to produce on-demand art, but to asses the expressivity of common morphological indicators to discriminate polygon shapes and  the part of subjectivity in the original artistic productions.
 
 
 General principle
@@ -22,7 +22,7 @@ General principle
 ![Schema of the worflow of the TidyCityPlugin](https://raw.githubusercontent.com/julienperret/TidyCity/image_doc/doc_images/rankingPrinciple.png)
 
 
-The general idea of the approach is to regroup the feature with similar charateristics into group and to correctly arrange these groupss. These charateristics are assessed through a set of morphological indicators and the groups are created with a classification method. Inside the group, an attribute is used to rank the different features (for example, the area in the image presenting the principle). Each group can be modeled as a rectangle and the aim of the layout generator is to find a proper way to dispose these rectangles.
+The general idea of the approach is to regroup the feature with similar characteristics into groups and to correctly arrange these groups. These characteristics are assessed through a set of morphological indicators and the groups are created with a classification method. Inside the group, an attribute is used to rank the different features (for example, the area in the image presenting the principle). Each group can be modeled as a rectangle and the aim of the layout generator is to find an optimal way to arrange these rectangles.
 
 
 The workflow
@@ -35,7 +35,7 @@ The plugin is composed of 3 steps :
 - (1) the calculation of common morphological indicators on a polygon layer ;
 - (2) the classification through a k-mean method ;
 - (3) the generation of classified layouts.
-If this three steps are consecutive, they can be ran independently if a layer with the relevant attributes is provided. For example, if you have produced your own indicators, you can directly proceed to the classification or if your features are already classified to generate a layout with them.
+If these three steps are consecutive, they can be run independently if a layer with the relevant attributes is provided. For example, if you have produced your own indicators, you can directly proceed to the classification or if your features are already classified to generate a layout with them.
 
 
 
@@ -52,7 +52,7 @@ NOTE : if the plugin is mising, you may have to allow experimental plugins, in t
 GUI of the plugin
 ---------------------
 
-The GUI of the plugin is basically composed of three parts that reflect the three steps of the workflow (indicator calculation, classification and layout generation). Each part has its own options and own "Ok" button that allows to run separatly the different steps.
+The GUI of the plugin is basically composed of three parts that reflect the three steps of the workflow (indicator calculation, classification and layout generation). Each part has its own options and one "Ok" button that allows to run separately the different steps.
 
 **Note : the option "Copy attributes between two steps" is a general option. It allows to keep the attribute of the layer between two steps and works for each step.**
 
@@ -60,10 +60,10 @@ The GUI of the plugin is basically composed of three parts that reflect the thre
 ![GUI of the plugin](https://raw.githubusercontent.com/julienperret/TidyCity/image_doc/doc_images/generalGUI.png)
 Indicators Calculation
 ---------------------
-This steps aims at calculating morphological indicators from a polygonal layer.
+This steps aims at calculating morphological indicators from a polygon layer.
 
 It requires as input :
-- **Input layer ** : The name of a polygonal layer with an ID field ;
+- **Input layer ** : The name of a polygon layer with an ID field ;
 - **Output layer name** : The name of the output layer ;
 - **ID attribute** : The name of the attribute field.
 
@@ -85,16 +85,16 @@ Classification
 This step determines different classes of features through a k-mean classification method.
 
 It requires as input :
-- **Input layer ** : The name of a polygonal layer with an ID field ;
+- **Input layer** : The name of a polygon layer with an ID field ;
 - **ID attribute** : The name of the attribute field ;
 - In the central panel, a list of numerical attributes can be selected. You can use the indicators calculated during the previsous step, your own indicators or a combination of both. During the process, the attribute values are scaled between 0 and 1;
 - **Number of classes** : the number of classes in which the features will be classified. This parameter is very important as it defines the number of groups used to produce the final layout ;
 - **Classification attribute** : a new attribute that stored the identifiant of the different classes  ;
  - **Output layer name** : The name of the output layer.
 
-By clicking on the "Ok" button of the section,  a new layer will be produced with a new attribute that informs about the class of the features and the attributes used for classification.
+By clicking on the "Ok" button of the section,  a new layer will be produced. It contains a new attribute that informs about the class of the features and the attributes used for classification.
 
-An example of classification of the world countries into 10 classes :
+An example of classification of the world countries with 10 classes :
 
 ![Map of classified countries](https://raw.githubusercontent.com/julienperret/TidyCity/image_doc/doc_images/classified.png)
 
@@ -122,10 +122,12 @@ The first method is very basic and generate a layout for which each class is on 
 
 ### Chazelle packing method
 
-This method aims at producing the layout that is contained into the minimal possible rectangle. As each class is contained into a bounding rectangle, this problem is of the class of rectangle packing problems. In our implementation, we use the Chazelle [CITEEEEE] heuristics to packing the rectangle of the classes.
+This method aims at producing the layout that is contained into the minimal possible rectangle. As each class is contained into a bounding rectangle, this problem is of the class of rectangle packing problems. In our implementation, we use the Chazelle (1983) heuristics to packing the rectangle of the classes.
 
+*Chazelle, B., 1983, The Bottom-left Bin-packing Heuristic : An Efficient Implementation, IEEE Transactions on Computers, Volume 32 Issue 8, August 1983 Pages 697-707*
 
 The following image presents the application of the Chazelle method on the rectangle of each class from the previous classification and their related features.
+
 ![Application of Chazelle Method on rectangle with feature](https://raw.githubusercontent.com/julienperret/TidyCity/image_doc/doc_images/chazelleMethod.png)
 
 As the occupation of the layout is not optimal, we implemented an extension method that increases the width of the rectangle and applies the transformation on their related features.
@@ -141,7 +143,7 @@ The code can be used as a standalone application, globally the code is splitted 
 - *square_packing.py* : this file contains the method to produce the output layout ;
 - *tidy_city.py* : the code of the QGIS plugin
 
-The following script shows how use the code through the  most important functions.
+The following script shows how to use the code through the  most important functions.
 The full code is available in the file *app.py*.
 
 ```python3
@@ -204,6 +206,11 @@ error = QgsVectorFileWriter.writeAsVectorFormat(layoutBoundingBox, os.path.join(
 
 ```
 
+Data samples
+---------------------
+* [World countries](https://github.com/julienperret/TidyCity/raw/image_doc/data_sample/world.tar.gz) : the intial dataset is available on [Thematic Mapping Website](http://thematicmapping.org/downloads/world_borders.php) but multi-polygon features are splitted into polygon features. 
+
+
 Conditions for use
 ---------------------
 This software is free to use under licensed under the GPL version 3.0 or greater. However, if you use this library in a research paper, you are kindly requested to acknowledge the use of this software.
@@ -225,4 +232,4 @@ Future developments
 
 Troubleshootings
 ---------------------
-- Error during indicators calculation : you need to use a layer with polygonal (and not multi-polygonal), non-empty and well formed geometries
+- *Error during indicators calculation step* : you need to use a layer with polygon (and not multi-polygon), non-empty and well formed geometries
