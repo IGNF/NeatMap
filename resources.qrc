@@ -1,5 +1,0 @@
-<RCC>
-    <qresource prefix="/plugins/IndicateursMorpho" >
-        <file>icon.png</file>
-    </qresource>
-</RCC>
