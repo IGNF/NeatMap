@@ -257,14 +257,38 @@ def minimumBoundingBox(boundingBox_tuple):
     
 #Try to pack the bounding box into the candidate bounding boxes
 def pack(boundingBox_tuples, boundingBoxes):
+    #Recursiev algorithm to find the minimal bounding box in term or arae
+    indexMin = 0 
+    indexMax = len(boundingBoxes) - 1
+    bestLayout = None
+    bestBox = None
+    while True :
+        
+        currentIndex = (int)((indexMax + indexMin) / 2)
+        currentBox = boundingBoxes[currentIndex]
+        layout = determineLayout(boundingBox_tuples, currentBox)
+        
+        if layout is None:
+            indexMin = currentIndex + 1
+        else:
+            indexMax = currentIndex
+            bestLayout = layout
+            bestBox = currentBox
+        #print(" currentIndex " + str(currentIndex) + "  minIndex  "  + str(indexMin) + "  maxIndex  " + str(indexMax)  )
+        if (indexMin == indexMax):
+            break;   
     
     
-    for b in boundingBoxes :
-            layout = determineLayout(boundingBox_tuples, b)
-            if not layout is None:
-                break
+   # count = 0
+    
+    #for bestBox in boundingBoxes :
+    #    count = count + 1
+    #    print("Treating : " + str(count) + "/" + str(len(boundingBoxes)))
+    #    bestLayout = determineLayout(boundingBox_tuples, bestBox)
+    #    if not bestLayout is None:
+    #        break
 
-    return layout, b
+    return bestLayout, bestBox
     
 #Generate a layout relatively to a bounding box
 #Placement is organized from widest  
