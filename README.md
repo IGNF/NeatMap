@@ -231,6 +231,10 @@ Contact for feedbacks
 [Mickaël Brasebin](http://recherche.ign.fr/labos/cogit/cv.php?nom=Brasebin) & [Julien Perret](http://recherche.ign.fr/labos/cogit/cv.php?prenom=Julien&nom=Perret)
 [COGIT Laboratory](http://recherche.ign.fr/labos/cogit/accueilCOGIT.php)
 
+Contributors
+---------------------
+* Rose Matelier and Bruce Thomas from ENSG. Development of a very first version with static classification method and simple layout.
+
 
 Future developments
 ---------------------
