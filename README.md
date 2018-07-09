@@ -68,7 +68,7 @@ Indicators Calculation
 This steps aims at calculating morphological indicators from a polygon layer.
 
 It requires as input :
-- **Input layer ** : The name of a polygon layer with an ID field ;
+- **Input layer** : The name of a polygon layer with an ID field ;
 - **Output layer name** : The name of the output layer ;
 - **ID attribute** : The name of the attribute field.
 
@@ -119,7 +119,7 @@ By clicking on the "Ok" button of the section,  a new layer will be produced, wi
 
 ### 1 line per class
 
-![Layout with one class per line]](https://raw.githubusercontent.com/julienperret/TidyCity/image_doc/doc_images/1perline.png)
+![Layout with one class per line](https://raw.githubusercontent.com/julienperret/TidyCity/image_doc/doc_images/1perline.png)
 
 
 The first method is very basic and generate a layout for which each class is on a line and the different features follow the line ordered according to the secondary attribute.
