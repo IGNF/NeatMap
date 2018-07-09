@@ -63,6 +63,8 @@ The GUI of the plugin is basically composed of three parts that reflect the thre
 
 
 ![GUI of the plugin](https://raw.githubusercontent.com/julienperret/TidyCity/image_doc/doc_images/generalGUI.png)
+
+
 Indicators Calculation
 ---------------------
 This steps aims at calculating morphological indicators from a polygon layer.
