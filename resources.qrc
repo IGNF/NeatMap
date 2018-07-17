@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/plugins/IndicateursMorpho" >
+    <qresource prefix="/plugins/TidyCity">
         <file>icon.png</file>
     </qresource>
 </RCC>
