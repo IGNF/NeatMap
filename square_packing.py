@@ -1,7 +1,31 @@
+
+
 from PyQt5.QtCore import QVariant
 from .morpho import *
 from qgis.core import *
 
+"""
+/***************************************************************************
+ TidyCity
+                                 A QGIS plugin
+ A simple QGIS python plugin for building tidy cities.
+                              -------------------
+        begin                : 2016-11-30
+        git sha              : $Format:%H$
+        copyright            : (C) 2016 - 2018 by IGN
+        email                : julien.perret@gmail.com; mickael.brasebin@ign.fr
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+
+"""
 
 """
 Structures and convention used in the code
@@ -193,6 +217,8 @@ def minimumBoundingBox(boundingBox_tuple):
     totalWidth = 0 ;
     heighestBox = 0;
     widestBox = 0
+
+    
     
     for boundingBox in boundingBox_tuple:
         lowerArea = lowerArea + boundingBox[3]
@@ -202,14 +228,14 @@ def minimumBoundingBox(boundingBox_tuple):
     upperArea = totalWidth * heighestBox
   
     
-    nb_BoundingBox = len(boundingBox)
+    nb_BoundingBox = len(boundingBox_tuple)
     
     possibleHeight = []
     possibleWidth = []
     
     
     for i in range(1, nb_BoundingBox+1) :
-        
+        #print(str(i) + " / " + str(nb_BoundingBox) + "  Calculating combinaison")
         for rectangle in combinaison(boundingBox_tuple, i):
             widthSum = 0
             heightSum = 0
@@ -225,15 +251,22 @@ def minimumBoundingBox(boundingBox_tuple):
     #All possible width and height
     possibleHeight = sorted(possibleHeight)
     possibleWidth = sorted(possibleWidth)
+    
+    #print("Sorting possible height and width")
 
     #Width, height, area
     boundingBox = []
     
+    append = boundingBox.append
+
+    #countWidth = 0
     for width in possibleWidth :
+        #countWidth = countWidth+1
+        #print("Width : " + str(countWidth) + "  /  " + str(len(possibleWidth)))
         #The width  must  be at least the height of the tallest rectangle
         if width < widestBox :
             continue
-        
+       
         #The height must  be at least the height of the tallest rectangle
         for height in possibleHeight:
             if height < heighestBox:
@@ -245,11 +278,16 @@ def minimumBoundingBox(boundingBox_tuple):
                 continue
             
             if area > upperArea:
-                continue
-            
-            boundingBox.append([None, width, height, area])
+                break
 
-    resultSorted = sorted(boundingBox, key=lambda tup: tup[3])
+            append([None, width, height, area])
+        
+    
+    
+
+    
+    resultSorted = sorted(boundingBox, key=lambda tup:  tup[3])
+    # resultSorted = sorted(boundingBox, key=lambda tup:  (abs(1 - tup[1]/tup[2]), tup[1]))
     # print(resultSorted)
     return resultSorted
 
@@ -262,31 +300,18 @@ def pack(boundingBox_tuples, boundingBoxes):
     indexMax = len(boundingBoxes) - 1
     bestLayout = None
     bestBox = None
-    while True :
+    
+
+    count = 0
+    
+    for bestBox in boundingBoxes :
         
-        currentIndex = (int)((indexMax + indexMin) / 2)
-        currentBox = boundingBoxes[currentIndex]
-        layout = determineLayout(boundingBox_tuples, currentBox)
-        
-        if layout is None:
-            indexMin = currentIndex + 1
-        else:
-            indexMax = currentIndex
-            bestLayout = layout
-            bestBox = currentBox
-        #print(" currentIndex " + str(currentIndex) + "  minIndex  "  + str(indexMin) + "  maxIndex  " + str(indexMax)  )
-        if (indexMin == indexMax):
-            break;   
-    
-    
-   # count = 0
-    
-    #for bestBox in boundingBoxes :
-    #    count = count + 1
-    #    print("Treating : " + str(count) + "/" + str(len(boundingBoxes)))
-    #    bestLayout = determineLayout(boundingBox_tuples, bestBox)
-    #    if not bestLayout is None:
-    #        break
+        print("Treating : " + str(count+1) + "/" + str(len(boundingBoxes)))
+        bestLayout = determineLayout(boundingBox_tuples, bestBox)
+        if not bestLayout is None:
+            currentBox = boundingBoxes[count]
+            break
+        count = count + 1
 
     return bestLayout, bestBox
     
