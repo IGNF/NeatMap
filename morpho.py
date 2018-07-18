@@ -1,8 +1,9 @@
 from PyQt5.QtGui import QTransform
-from qgis.core import QgsField, QgsGeometry, QgsPointXY, QgsRectangle
+from qgis.core import QgsField, QgsGeometry, QgsPointXY, QgsRectangle,  QgsWkbTypes
 import math
 import numpy
 from statistics import *
+
 """
 SMBR computation.
 """
@@ -128,7 +129,12 @@ def compute_compactness(area, perimeter):
 
 
 def complexityPolygon(geom):
-    n = len(geom[0])
+    n = 1 
+    if(geom.wkbType() ==  QgsWkbTypes.Polygon):
+        n = len(geom)
+    elif(geom.wkbType() ==  QgsWkbTypes.MultiPolygon):
+        n = len(geom[0])
+    
     return n-1
 
 def compute_complexity(geom):
