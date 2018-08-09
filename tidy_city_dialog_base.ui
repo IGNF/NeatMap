@@ -336,7 +336,12 @@
               </item>
               <item>
                <property name="text">
-                <string>Chazelle packing method</string>
+                <string>Fast simple method</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Chazelle method (may be long for more than 15 classes)</string>
                </property>
               </item>
              </widget>
