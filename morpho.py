@@ -153,12 +153,7 @@ def compute_compactness(area, perimeter):
 
 
 def complexityPolygon(geom):
-    n = 1 
-    if(geom.wkbType() ==  QgsWkbTypes.Polygon):
-        n = len(geom)
-    elif(geom.wkbType() ==  QgsWkbTypes.MultiPolygon):
-        n = len(geom[0])
-    
+    n = len(geom)
     return n-1
 
 def compute_complexity(geom):
