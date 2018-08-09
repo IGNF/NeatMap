@@ -90,7 +90,24 @@ def advanced_layout(vectorLayer, attributeClass, secondaryRankingAttribute, outp
     #2 - Determining the possible bounding boxes ordered by area
     minimumBoundingBoxes = minimumBoundingBox(boundingBox_tuples)
     #2 - Packing the bounding box into the minimumBounding box b with smallest area
-    rectngle_tuple, b = pack(boundingBox_tuples, minimumBoundingBoxes)
+    rectngle_tuple, b = pack(boundingBox_tuples, minimumBoundingBoxes, 0)
+    
+    #3 - Extend pack rectangles
+    extendRectangleTuple(rectngle_tuple, b)
+    
+    # can be transformed into VectorLayer with => fromPlaceRectangleToVectorLayer(rectngle_tuple)
+    #3 - Displacing the geographic feature 
+    vl = movingFeature(rectngle_tuple, vectorLayer, attributeClass, secondaryRankingAttribute, outputLayerName, fields)
+    return vl,  fromPlaceRectangleToVectorLayer(rectngle_tuple)
+
+
+def fast_layout(vectorLayer, attributeClass, secondaryRankingAttribute, outputLayerName, copyAtt):
+    #1- We generate a basic layout with no placement (1 bounding box = 1 class)
+    boundingBox_tuples, fields =  initialise_layout(vectorLayer, attributeClass, secondaryRankingAttribute, outputLayerName, copyAtt)
+    #2 - Determining a unique possible boundingBow with as width the widthest box and the sum of all heights
+    minimumBoundingBoxes = minimumUniqueBoundingBox(boundingBox_tuples)
+    #2 - Packing the bounding box into the minimumBounding box b with smallest area
+    rectngle_tuple, b = pack(boundingBox_tuples, minimumBoundingBoxes, 1)
     
     #3 - Extend pack rectangles
     extendRectangleTuple(rectngle_tuple, b)
@@ -207,6 +224,20 @@ def initialise_layout(vectorLayer, attributeClass, secondaryRankingAttribute, ou
 
     return boundingBox_tuples, fields
 
+#Determin a unique minimum box with as width the widest box
+#and as height the sum of all heights
+def minimumUniqueBoundingBox(boundingBox_tuple):
+    widestBox = 0
+    totalHeight = 0 ;
+    for boundingBox in boundingBox_tuple:
+        widestBox = max(widestBox, boundingBox[1])
+        totalHeight =  totalHeight + boundingBox[2]
+    
+     #Width, height, area
+    boundingBox = []
+    boundingBox.append([None, widestBox , totalHeight , widestBox * totalHeight ])
+    return  boundingBox
+    
 #Determine all the candidate bounding boxes sorted by area
 def minimumBoundingBox(boundingBox_tuple):
     # Testing all boxes in increasing order and keep the  smallest
@@ -294,7 +325,9 @@ def minimumBoundingBox(boundingBox_tuple):
     
     
 #Try to pack the bounding box into the candidate bounding boxes
-def pack(boundingBox_tuples, boundingBoxes):
+#Ranking = 0 position priority ordered by distance to origin (for optimal layout)
+#Ranking = 1 position priority ordered by y then x
+def pack(boundingBox_tuples, boundingBoxes, ranking):
     #Recursiev algorithm to find the minimal bounding box in term or arae
     indexMin = 0 
     indexMax = len(boundingBoxes) - 1
@@ -307,7 +340,7 @@ def pack(boundingBox_tuples, boundingBoxes):
     for bestBox in boundingBoxes :
         
         print("Treating : " + str(count+1) + "/" + str(len(boundingBoxes)))
-        bestLayout = determineLayout(boundingBox_tuples, bestBox)
+        bestLayout = determineLayout(boundingBox_tuples, bestBox, ranking)
         if not bestLayout is None:
             currentBox = boundingBoxes[count]
             break
@@ -317,7 +350,7 @@ def pack(boundingBox_tuples, boundingBoxes):
     
 #Generate a layout relatively to a bounding box
 #Placement is organized from widest  
-def determineLayout(boundingBox_tuples, boundingBox):
+def determineLayout(boundingBox_tuples, boundingBox, ranking):
     boundingBox_tuples = sorted(boundingBox_tuples, key=lambda tup: tup[1], reverse=True)
     #X,Y coordinates
     #Originate is lower left point
@@ -372,7 +405,10 @@ def determineLayout(boundingBox_tuples, boundingBox):
         
    
         #Reordering vertices according to origin distance
-        possibleVertices = sorted(possibleVertices, key=lambda x: (x[1] * x[1] + x[0] * x[0]))
+        if (ranking == 1) :
+            possibleVertices = sorted(possibleVertices, key=lambda x: x[1] * 1000 + x[0])
+        else :
+            possibleVertices = sorted(possibleVertices, key=lambda x: (x[1] * x[1] + x[0] * x[0]))
     
     
     

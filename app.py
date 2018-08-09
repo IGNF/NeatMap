@@ -98,6 +98,21 @@ error = QgsVectorFileWriter.writeAsVectorFormat(layoutBoundingBox, os.path.join(
 #Packed layout
 error = QgsVectorFileWriter.writeAsVectorFormat(otherLayout, os.path.join(output_dir,"otherLayout.shp"),"utf-8", crs, "ESRI Shapefile")
 
+#Step 3 ter : other layout method, less optimal that in Step 3 bis. The widestbox is placed at first and the other one
+#Are placed on this box, according to the x axis etc (like making a wall with bricks)
+# (layerClassified) : the input layer (the output from previous step)
+# (classAttribute) : the name of the attribute in which the class will be stored)
+# (attSecondary) : the secondary ranking attribute
+# (layerName) : the name of the output layer name
+# (True) => Means that all attributes will be copied
+otherLayout2, layoutBoundingBox2 = fast_layout(layerClassified, classAttribute , attSecondary, layerName, True)
+
+#Bounding boxes used for fast layout production
+error = QgsVectorFileWriter.writeAsVectorFormat(layoutBoundingBox2, os.path.join(output_dir,"boundingBox2.shp"),"utf-8", crs, "ESRI Shapefile")
+
+
+#Packed layout
+error = QgsVectorFileWriter.writeAsVectorFormat(otherLayout2, os.path.join(output_dir,"otherLayout2.shp"),"utf-8", crs, "ESRI Shapefile")
 
 qgs.exitQgis()
 
