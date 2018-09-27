@@ -1,4 +1,4 @@
-![Icon of the project]../blob/image_doc/doc_images/icon.png?raw=true)
+![Icon of the project](../blob/image_doc/doc_images/icon.png?raw=true)
 
 
 NeatMap
