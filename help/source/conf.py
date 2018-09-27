@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# TidyCity documentation build configuration file, created by
+# NeatMap documentation build configuration file, created by
 # sphinx-quickstart on Sun Feb 12 17:11:03 2012.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -40,8 +40,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'TidyCity'
-copyright = u'2013, IGN'
+project = u'NeatMap'
+copyright = u'2018, IGN'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -178,7 +178,7 @@ htmlhelp_basename = 'TemplateClassdoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'TidyCity.tex', u'TidyCity Documentation',
+  ('index', 'NeatMap.tex', u'NeatMap Documentation',
    u'IGN', 'manual'),
 ]
 
@@ -211,6 +211,6 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'TemplateClass', u'TidyCity Documentation',
+    ('index', 'TemplateClass', u'NeatMap Documentation',
      [u'IGN'], 1)
 ]

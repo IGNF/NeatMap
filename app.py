@@ -17,7 +17,7 @@ from TidyCity.square_packing import *
 
 
 
-input_dir = "/home/mbrasebin/Documents/Donnees/Test/TidyCity/world/"
+input_dir = "/home/mbrasebin/Documents/Donnees/Test/NeatMap/world/"
 output_dir = "/home/mbrasebin/Documents/Donnees/temp/"
 
 fid_atribute = "fid"

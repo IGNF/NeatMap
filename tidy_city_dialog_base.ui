@@ -22,7 +22,7 @@
       </font>
      </property>
      <property name="text">
-      <string>TidyCity</string>
+      <string>NeatMap</string>
      </property>
     </widget>
    </item>
@@ -39,7 +39,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>339</width>
+        <width>451</width>
         <height>761</height>
        </rect>
       </property>
@@ -172,7 +172,7 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>291</width>
+                 <width>403</width>
                  <height>73</height>
                 </rect>
                </property>
@@ -429,7 +429,7 @@
                    </size>
                   </property>
                   <property name="text">
-                   <string>tidy_city_layer</string>
+                   <string>neat_map_layer</string>
                   </property>
                  </widget>
                 </item>
