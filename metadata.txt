@@ -7,14 +7,14 @@
 # This file should be included when you package your plugin.# Mandatory items:
 
 [general]
-name=TidyCity
+name=NeatMap
 qgisMinimumVersion=3.0
 description=A simple QGIS python plugin for building tidy cities.
 version=1.0
 author=IGN/ENSG
 email=julien.perret@gmail.com; mickael.brasebin@ign.fr
 
-about=A QGIS python plugin for building tidy cities (i.e for the classification and producing layout of polygonal features). Initially developped  by Mickaël Brasebin Julien Perret, Rose Matelier and Bruce Thomas at ENSG/IGNF.
+about=A QGIS python plugin for building organized cities (i.e for the classification and producing layout of polygonal features). Initially developped  by Mickaël Brasebin Julien Perret, Rose Matelier and Bruce Thomas at ENSG/IGNF.
 
 tracker=https://github.com/julienperret/TidyCity/issues
 repository=https://github.com/julienperret/TidyCity

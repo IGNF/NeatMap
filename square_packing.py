@@ -6,7 +6,7 @@ from qgis.core import *
 
 """
 /***************************************************************************
- TidyCity
+ NeatMap
                                  A QGIS plugin
  A simple QGIS python plugin for building tidy cities.
                               -------------------

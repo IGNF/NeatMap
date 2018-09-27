@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
- TidyCity
+ NeatMap
                                  A QGIS plugin
  A simple QGIS python plugin for building tidy cities.
                               -------------------
