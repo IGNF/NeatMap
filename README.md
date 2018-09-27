@@ -1,7 +1,7 @@
 ![Icon of the project](https://raw.githubusercontent.com/julienperret/TidyCity/image_doc/doc_images/icon.png)
 
 
-NeatMao
+NeatMap
 ============
 
 NeatMap is a plugin for [QGIS](https://www.qgis.org/fr/site/) that allows the production of an "organized" set of polygon features according to their shapes. In order to proceed, three steps are necessary : 1/ morphological indicators calculation, 2/ classification of the polygon features using these indicators and 3/ generation of the disposition of the features.
