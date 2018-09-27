@@ -1,4 +1,4 @@
-![Icon of the project](https://raw.githubusercontent.com/julienperret/TidyCity/image_doc/doc_images/icon.png)
+![Icon of the project](https://raw.githubusercontent.com/julienperret/TidyCity/image_doc/doc_images/icon.png?raw=true)
 
 
 NeatMap
