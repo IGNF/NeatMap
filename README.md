@@ -11,7 +11,7 @@ The project is developed as an Open-Source library based on :
 - [Scikit learn 0.19.1](http://scikit-learn.org/stable/index.html) :  for the classification.
 
 
-![Sample of result](https://raw.githubusercontent.com/julienperret/TidyCity/image_doc/doc_images/sample.png)
+![Sample of result](../image_doc/doc_images/sample.png?raw=true)
 
 Introduction
 ---------------------
@@ -24,7 +24,7 @@ The layout idea was based on the artistic work of [Armel Caron : tidy cities](ht
 General principle
 ---------------------
 
-![Schema of the worflow of the TidyCityPlugin](https://raw.githubusercontent.com/julienperret/TidyCity/image_doc/doc_images/rankingPrinciple.png)
+![Schema of the worflow of the TidyCityPlugin](../image_doc/doc_images/rankingPrinciple.png?raw=true)
 
 
 The general idea of the approach is to regroup the feature with similar characteristics into groups and to correctly arrange these groups. These characteristics are assessed through a set of morphological indicators and the groups are created with a classification method. Inside the group, an attribute is used to rank the different features (for example, the area in the image presenting the principle). Each group can be modeled as a rectangle and the aim of the layout generator is to find an optimal way to arrange these rectangles.
@@ -32,7 +32,7 @@ The general idea of the approach is to regroup the feature with similar characte
 
 The workflow
 ---------------------
-![Schema of the worflow of the TidyCityPlugin](https://raw.githubusercontent.com/julienperret/TidyCity/image_doc/doc_images/generalSchema.png)
+![Schema of the worflow of the TidyCityPlugin](../image_doc/doc_images/generalSchema.png?raw=true)
 
 
 
@@ -62,7 +62,7 @@ The GUI of the plugin is basically composed of three parts that reflect the thre
 **Note : the option "Copy attributes between two steps" is a general option. It allows to keep the attribute of the layer between two steps and works for each step.**
 
 
-![GUI of the plugin](https://raw.githubusercontent.com/julienperret/TidyCity/image_doc/doc_images/generalGUI.png)
+![GUI of the plugin](../image_doc/doc_images/generalGUI.png?raw=true)
 
 
 Indicators Calculation
@@ -103,7 +103,7 @@ By clicking on the "Ok" button of the section,  a new layer will be produced. It
 
 An example of classification of the world countries with 10 classes :
 
-![Map of classified countries](https://raw.githubusercontent.com/julienperret/TidyCity/image_doc/doc_images/classified.png)
+![Map of classified countries](../image_doc/doc_images/classified.png?raw=true)
 
 
 Layout generation
@@ -121,8 +121,7 @@ By clicking on the "Ok" button of the section,  a new layer will be produced, wi
 
 ### 1 line per class
 
-![Layout with one class per line](https://raw.githubusercontent.com/julienperret/TidyCity/image_doc/doc_images/1perline.png)
-
+![Layout with one class per line](../image_doc/doc_images/1perline.png?raw=true)
 
 The first method is very basic and generate a layout for which each class is on a line and the different features follow the line ordered according to the secondary attribute.
 
@@ -135,11 +134,11 @@ This method aims at producing the layout that is contained into the minimal poss
 
 The following image presents the application of the Chazelle method on the rectangle of each class from the previous classification and their related features.
 
-![Application of Chazelle Method on rectangle with feature](https://raw.githubusercontent.com/julienperret/TidyCity/image_doc/doc_images/chazelleMethod.png)
+![Application of Chazelle Method on rectangle with feature](../image_doc/doc_images/chazelleMethod.png?raw=true)
 
 As the occupation of the layout is not optimal, we implemented an extension method that increases the width of the rectangle and applies the transformation on their related features.
 
-![Application of the extension of the features](https://raw.githubusercontent.com/julienperret/TidyCity/image_doc/doc_images/extendMethod.png)
+![Application of the extension of the features](../image_doc/doc_images/extendMethod.png?raw=true)
 
 Standalone use of the code
 ---------------------
