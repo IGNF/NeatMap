@@ -1,10 +1,10 @@
 ![Icon of the project](https://raw.githubusercontent.com/julienperret/TidyCity/image_doc/doc_images/icon.png)
 
 
-TidyCity
+NeatMao
 ============
 
-TidyCity is a plugin for [QGIS](https://www.qgis.org/fr/site/) that allows the production of "tidy" set of polygon features according to their morphology. In order to proceed, three steps are necessary : 1/ morphological indicators calculation, 2/ classification of the polygon features using these indicators and 3/ generation of the disposition of the features.
+NeatMap is a plugin for [QGIS](https://www.qgis.org/fr/site/) that allows the production of an "organized" set of polygon features according to their shapes. In order to proceed, three steps are necessary : 1/ morphological indicators calculation, 2/ classification of the polygon features using these indicators and 3/ generation of the disposition of the features.
 
 The project is developed as an Open-Source library based on :
 - [QGIS API V3.0](https://www.qgis.org/fr/site/), for morphological operators and layout generation ;
@@ -18,7 +18,7 @@ Introduction
 
 This research library has been initiated during a [ENSG](http://www.ensg.eu) student work and continues with [COGIT team](http://recherche.ign.fr/labos/cogit/accueilCOGIT.php) research developments.
 
-The initial idea was based on the artistic work of [Armel Caron : tidy cities](http://www.armellecaron.fr/works/les-villes-rangees/) and the aim is to question the ability of automatic algorithms to generate similar layouts. The idea is not to produce on-demand art, but to asses the expressivity of common morphological indicators to discriminate polygon shapes and  the part of subjectivity in the original artistic productions.
+The layout idea was based on the artistic work of [Armel Caron : tidy cities](http://www.armellecaron.fr/works/les-villes-rangees/) and the aim is to question the ability of automatic algorithms to generate similar layouts. The idea is not to produce on-demand art, but to asses the expressivity of common morphological indicators to discriminate polygon shapes and  the part of subjectivity in the original artistic productions.
 
 
 General principle
@@ -50,7 +50,7 @@ The only requirement is to get QGIS 3.0 or later installed. You can download it 
 
 Currently the plugin is not on QGIS repositories, you have to install it manually. You have to download  the [automatically generated zip file](https://github.com/julienperret/TidyCity/archive/master.zip) and to unzip it in the plugins folder (https://gis.stackexchange.com/questions/274311/qgis-3-plugin-folder-location).
 
-In QGIS, in the "Extenion" menu > "Install Extension" option, you have just to activate the "TidyCity" plugin.
+In QGIS, in the "Extenion" menu > "Install Extension" option, you have just to activate the "NeatMap" plugin.
 
 NOTE : if the plugin is mising, you may have to allow experimental plugins, in the parameter menu.
 
@@ -154,7 +154,6 @@ The following script shows how to use the code through the  most important funct
 The full code is available in the file *app.py*.
 
 ```python3
-
 layer_polygons = QgsVectorLayer(os.path.join(input_dir,'world.shp'), 'polygons', 'ogr')
 
 #Export layout
@@ -167,6 +166,10 @@ crs=QgsCoordinateReferenceSystem("epsg:-1")
 # (True) => Means that all attributes will be copied
 layerOut = calculate(layerName,layer_polygons,fid_atribute, True);
 
+#Export features with attributes
+error = QgsVectorFileWriter.writeAsVectorFormat(layerOut, os.path.join(output_dir,"indicator.shp"),"utf-8", layerOut.crs(), "ESRI Shapefile")
+
+
 #Determining the attribute to use for the classification
 attributes = ["area", "elongation" , "compact."]
 #Output classification attribute
@@ -174,13 +177,17 @@ classAttribute = "class"
 
 #Step 2 : Applying the classification
 # (layerOut) : the input layer (the output from previous step)
-# (attributes) : the list of attributes on which the classificatino will be proceeded
+# (attributes) : the list of attributes on which the classification will be proceeded
 # (10) : the number of classes
 # (layerName) : the name of the output layer name
 # (classAttribute) : the name of the attribute in which the class will be stored)
 # f(id_atribute) => The name of the fid attribute
 # (True) => Means that all attributes will be copied
 layerClassified = kmeans(layerOut, attributes, 10, layerName, classAttribute, fid_atribute, True)
+
+#Export features with  classificatinoadvanced_layout
+error = QgsVectorFileWriter.writeAsVectorFormat(layerClassified, os.path.join(output_dir,"classified.shp"),"utf-8", layerClassified.crs(), "ESRI Shapefile")
+
 
 #Step 3 ! Applying a naive layout
 #Secondary attribute to sort the feature (descending)
@@ -192,8 +199,6 @@ attSecondary = "area"
 # (layerName) : the name of the output layer name
 # (True) => Means that all attributes will be copied
 newLayoutLayer = naive_layout(layerClassified, classAttribute , attSecondary, layerName, True)
-
-
 
 #Naive layout
 error = QgsVectorFileWriter.writeAsVectorFormat(newLayoutLayer, os.path.join(output_dir,"naiveLayout.shp"),"utf-8", crs, "ESRI Shapefile")
@@ -207,9 +212,30 @@ error = QgsVectorFileWriter.writeAsVectorFormat(newLayoutLayer, os.path.join(out
 # (True) => Means that all attributes will be copied
 otherLayout, layoutBoundingBox = advanced_layout(layerClassified, classAttribute , attSecondary, layerName, True)
 
-
 #Bounding boxes used for pack layout production
 error = QgsVectorFileWriter.writeAsVectorFormat(layoutBoundingBox, os.path.join(output_dir,"boundingBox.shp"),"utf-8", crs, "ESRI Shapefile")
+
+
+#Packed layout
+error = QgsVectorFileWriter.writeAsVectorFormat(otherLayout, os.path.join(output_dir,"otherLayout.shp"),"utf-8", crs, "ESRI Shapefile")
+
+#Step 3 ter : other layout method, less optimal that in Step 3 bis. The widestbox is placed at first and the other one
+#Are placed on this box, according to the x axis etc (like making a wall with bricks)
+# (layerClassified) : the input layer (the output from previous step)
+# (classAttribute) : the name of the attribute in which the class will be stored)
+# (attSecondary) : the secondary ranking attribute
+# (layerName) : the name of the output layer name
+# (True) => Means that all attributes will be copied
+otherLayout2, layoutBoundingBox2 = fast_layout(layerClassified, classAttribute , attSecondary, layerName, True)
+
+#Bounding boxes used for fast layout production
+error = QgsVectorFileWriter.writeAsVectorFormat(layoutBoundingBox2, os.path.join(output_dir,"boundingBox2.shp"),"utf-8", crs, "ESRI Shapefile")
+
+
+#Packed layout
+error = QgsVectorFileWriter.writeAsVectorFormat(otherLayout2, os.path.join(output_dir,"otherLayout2.shp"),"utf-8", crs, "ESRI Shapefile")
+
+qgs.exitQgis()
 
 ```
 

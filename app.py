@@ -64,7 +64,7 @@ classAttribute = "class"
 # (True) => Means that all attributes will be copied
 layerClassified = kmeans(layerOut, attributes, 10, layerName, classAttribute, fid_atribute, True)
 
-#Export features with  classificatino
+#Export features with  classificatinoadvanced_layout
 error = QgsVectorFileWriter.writeAsVectorFormat(layerClassified, os.path.join(output_dir,"classified.shp"),"utf-8", layerClassified.crs(), "ESRI Shapefile")
 
 
