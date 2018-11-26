@@ -3,7 +3,7 @@
 /***************************************************************************
  NeatMap
                                  A QGIS plugin
- A simple QGIS python plugin for building tidy cities.
+ A simple QGIS python plugin for building neat maps.
                               -------------------
         begin                : 2016-11-30
         git sha              : $Format:%H$
@@ -126,13 +126,13 @@ def find(geom, index, dictionary, idAttribute):
 def distance_from_polygon_to_layer(geom, index, dictionary, layer_id):
     #Centroid of input buildings
     point = geom.pointOnSurface().asPoint()
-    #Cprint(point.asWkt())   
+    #Cprint(point.asWkt())
     distance = dictionary[index.nearestNeighbor(point,1)[0]].geometry().distance(geom)
 
     #Cprint(distance)
     bbox = geom.buffer(distance*1.5,3).boundingBox()
     #Cprint(bbox.asWktPolygon())
-    
+
     return min(
         ((f.geometry().distance(geom), f.attribute(layer_id))
          for f in map(lambda id: dictionary[id], index.intersects(bbox))),
@@ -153,8 +153,8 @@ def compute_compactness(area, perimeter):
 
 
 def complexityPolygon(geom):
-    
-    
+
+
     return len(geom)-1
 
 def compute_complexity(geom):
@@ -171,7 +171,7 @@ def compute_complexity(geom):
         for v in polygon :
             count = count + complexityPolygon(v)
         return count
-    
+
     return 0
 
 def compute_convexity1(geom, area):
@@ -186,7 +186,7 @@ def compute_convexity2(area, SMBR_area):
     """
     Calcul de la convexité selon le SMBR.
     """
-    convexity2 = area/SMBR_area	
+    convexity2 = area/SMBR_area
     return convexity2
 
 def compute_formFactor(hauteur, SMBR_width, SMBR_height):
@@ -202,5 +202,3 @@ def compute_formIndice(hauteur, area):
     """
     formIndice = hauteur**2 / area
     return formIndice
-
-

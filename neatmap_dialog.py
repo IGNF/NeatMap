@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
- TidyCityDialog
+ NeatMapDialog
                                  A QGIS plugin
- A simple QGIS python plugin for building tidy cities.
+ A simple QGIS python plugin for building neat maps.
                              -------------------
         begin                : 2016-11-30
         git sha              : $Format:%H$
@@ -27,13 +27,13 @@ from PyQt5 import QtGui, uic
 from PyQt5.QtWidgets import  QDialog
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'tidy_city_dialog_base.ui'))
+    os.path.dirname(__file__), 'neatmap_dialog_base.ui'))
 
 
-class TidyCityDialog(QDialog, FORM_CLASS):
+class NeatMapDialog(QDialog, FORM_CLASS):
     def __init__(self, parent=None):
         """Constructor."""
-        super(TidyCityDialog, self).__init__(parent)
+        super(NeatMapDialog, self).__init__(parent)
         # Set up the user interface from Designer.
         # After setupUI you can access any designer object by doing
         # self.<objectname>, and you can use autoconnect slots - see

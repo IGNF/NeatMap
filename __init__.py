@@ -31,5 +31,5 @@ def classFactory(iface):  # pylint: disable=invalid-name
     :type iface: QgsInterface
     """
     #
-    from .tidy_city import TidyCity
-    return TidyCity(iface)
+    from .neatmap import NeatMap
+    return NeatMap(iface)

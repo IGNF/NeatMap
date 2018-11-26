@@ -31,7 +31,7 @@ from qgis.core import *
 Structures and convention used in the code
 
 Variable named : boundingBox (QGSFeatureList, width, height, area)
-Variable named : rectangle (QGSFeatureList, x, y, width, height, area) 
+Variable named : rectangle (QGSFeatureList, x, y, width, height, area)
 Variable named : vertex (x,y)
 
 """
@@ -75,14 +75,14 @@ def naive_layout(vectorLayer, attributeClass, secondaryRankingAttribute, outputL
             feature.setGeometry(geometry)
             featureList.append(feature)
         current_y = current_y + boundingBox[2]
-    
-           
+
+
     #Commit changes
     pr.addFeatures(featureList)
     vl.commitChanges()
 
     return vl
-    
+
 
 def advanced_layout(vectorLayer, attributeClass, secondaryRankingAttribute, outputLayerName, copyAtt):
     #1- We generate a basic layout with no placement (1 bounding box = 1 class)
@@ -91,12 +91,12 @@ def advanced_layout(vectorLayer, attributeClass, secondaryRankingAttribute, outp
     minimumBoundingBoxes = minimumBoundingBox(boundingBox_tuples)
     #2 - Packing the bounding box into the minimumBounding box b with smallest area
     rectngle_tuple, b = pack(boundingBox_tuples, minimumBoundingBoxes, 0)
-    
+
     #3 - Extend pack rectangles
     extendRectangleTuple(rectngle_tuple, b)
-    
+
     # can be transformed into VectorLayer with => fromPlaceRectangleToVectorLayer(rectngle_tuple)
-    #3 - Displacing the geographic feature 
+    #3 - Displacing the geographic feature
     vl = movingFeature(rectngle_tuple, vectorLayer, attributeClass, secondaryRankingAttribute, outputLayerName, fields)
     return vl,  fromPlaceRectangleToVectorLayer(rectngle_tuple)
 
@@ -108,12 +108,12 @@ def fast_layout(vectorLayer, attributeClass, secondaryRankingAttribute, outputLa
     minimumBoundingBoxes = minimumUniqueBoundingBox(boundingBox_tuples)
     #2 - Packing the bounding box into the minimumBounding box b with smallest area
     rectngle_tuple, b = pack(boundingBox_tuples, minimumBoundingBoxes, 1)
-    
+
     #3 - Extend pack rectangles
     extendRectangleTuple(rectngle_tuple, b)
-    
+
     # can be transformed into VectorLayer with => fromPlaceRectangleToVectorLayer(rectngle_tuple)
-    #3 - Displacing the geographic feature 
+    #3 - Displacing the geographic feature
     vl = movingFeature(rectngle_tuple, vectorLayer, attributeClass, secondaryRankingAttribute, outputLayerName, fields)
     return vl,  fromPlaceRectangleToVectorLayer(rectngle_tuple)
 
@@ -122,7 +122,7 @@ def fast_layout(vectorLayer, attributeClass, secondaryRankingAttribute, outputLa
 
 
 #def equal(rectangle1, rectangle2):
- #   return (rectangle1[1] == rectangle2[1]) and (rectangle1[2] == rectangle2[2]) and (rectangle1[3] == rectangle2[3]) and (rectangle1[4] == rectangle2[4]) 
+ #   return (rectangle1[1] == rectangle2[1]) and (rectangle1[2] == rectangle2[2]) and (rectangle1[3] == rectangle2[3]) and (rectangle1[4] == rectangle2[4])
 """
 Secondary methods
 """
@@ -136,8 +136,8 @@ def initialise_layout(vectorLayer, attributeClass, secondaryRankingAttribute, ou
     fni = vectorLayer.fields().indexFromName(attributeClass)
     unique_values = vectorLayer.uniqueValues(fni)
     fields = [vectorLayer.fields().field(attributeClass), vectorLayer.fields().field(secondaryRankingAttribute)]
-    
-    
+
+
     tempAttributeList = []
     if copyAtt :
         tempAttributeList = vectorLayer.fields()
@@ -145,16 +145,16 @@ def initialise_layout(vectorLayer, attributeClass, secondaryRankingAttribute, ou
             if (fTemp.name() != secondaryRankingAttribute) and (fTemp.name() != attributeClass):
                 fields.append(fTemp)
 
-        
-  
+
+
 
     #That tuples contain bounding boxes
-    #(1) a feature list for a given class 
+    #(1) a feature list for a given class
     #(2) the width of the rectangle of the class
     #(3) the height of the rectangle of the class
     #(4) the area of the rectangle of the class (3 * 2)
     boundingBox_tuples = []
-    
+
     #For each class
     for val in unique_values:
         #We list the features of the class
@@ -167,10 +167,10 @@ def initialise_layout(vectorLayer, attributeClass, secondaryRankingAttribute, ou
         it = vectorLayer.getFeatures(request)
         #The x of the current feature
         x_current = 0
-  
+
         #The heighest bow is necessary to shift the next line
         heighestBox = 0;
-        
+
         for featCurrent in it :
            # print("Valeurs : class value " + str(featCurrent.attribute(attributeClass)) + "  secondary value" + str(featCurrent.attribute(secondaryRankingAttribute)))
             geom = featCurrent.geometry()
@@ -178,24 +178,24 @@ def initialise_layout(vectorLayer, attributeClass, secondaryRankingAttribute, ou
             minBounds, area, angle, width, height = compute_SMBR(geom)
             #The centroid of the box
             centroid = minBounds.centroid().asPoint()
-            
-            #We check that the 
+
+            #We check that the
             if(width > height) :
                 angle = angle + 90
                 width, height = height, width
-            
+
             #Rotate of the geometry according to SMBR angle
             err = geom.rotate( -angle, centroid)
 
-            
+
             #Determining the translation into a local referential
             dx = x_current - centroid.x() + width/2.0
             dy = - centroid.y()
 
             heighestBox = max(heighestBox, height)
-            
+
             x_current = x_current + (width)
-           
+
             err = geom.translate(dx,dy)
 
             #We create a feature with the fields and the transformed geometry
@@ -204,8 +204,8 @@ def initialise_layout(vectorLayer, attributeClass, secondaryRankingAttribute, ou
             new_feature.initAttributes(len(fields))
             new_feature.setAttribute(0, featCurrent.attribute(attributeClass))
             new_feature.setAttribute(1, featCurrent.attribute(secondaryRankingAttribute))
-            
-            
+
+
             if copyAtt :
                 countAt = 2;
                 countTemp = 0;
@@ -214,17 +214,17 @@ def initialise_layout(vectorLayer, attributeClass, secondaryRankingAttribute, ou
                         new_feature.setAttribute(countAt, featCurrent.attribute(countTemp))
                         countAt = countAt+1
                     countTemp= countTemp +1
-            
+
 
             featureList.append(new_feature)
-        
-        
+
+
         #The rectangle is added to the tuple
         boundingBox_tuples.append([featureList, x_current, heighestBox, x_current * heighestBox])
 
     return boundingBox_tuples, fields
 
-#Determin a unique minimum box with as width the widest box
+#Determine a unique minimum box with as width the widest box
 #and as height the sum of all heights
 def minimumUniqueBoundingBox(boundingBox_tuple):
     widestBox = 0
@@ -232,12 +232,12 @@ def minimumUniqueBoundingBox(boundingBox_tuple):
     for boundingBox in boundingBox_tuple:
         widestBox = max(widestBox, boundingBox[1])
         totalHeight =  totalHeight + boundingBox[2]
-    
+
      #Width, height, area
     boundingBox = []
     boundingBox.append([None, widestBox , totalHeight , widestBox * totalHeight ])
     return  boundingBox
-    
+
 #Determine all the candidate bounding boxes sorted by area
 def minimumBoundingBox(boundingBox_tuple):
     # Testing all boxes in increasing order and keep the  smallest
@@ -249,22 +249,22 @@ def minimumBoundingBox(boundingBox_tuple):
     heighestBox = 0;
     widestBox = 0
 
-    
-    
+
+
     for boundingBox in boundingBox_tuple:
         lowerArea = lowerArea + boundingBox[3]
         totalWidth = totalWidth + boundingBox[1]
         heighestBox = max(heighestBox, boundingBox[2])
         widestBox = max(widestBox, boundingBox[1])
     upperArea = totalWidth * heighestBox
-  
-    
+
+
     nb_BoundingBox = len(boundingBox_tuple)
-    
+
     possibleHeight = []
     possibleWidth = []
-    
-    
+
+
     for i in range(1, nb_BoundingBox+1) :
         #print(str(i) + " / " + str(nb_BoundingBox) + "  Calculating combinaison")
         for rectangle in combinaison(boundingBox_tuple, i):
@@ -278,16 +278,16 @@ def minimumBoundingBox(boundingBox_tuple):
             possibleHeight.append(heightSum)
             possibleWidth.append(widthSum)
 
-    
+
     #All possible width and height
     possibleHeight = sorted(possibleHeight)
     possibleWidth = sorted(possibleWidth)
-    
+
     #print("Sorting possible height and width")
 
     #Width, height, area
     boundingBox = []
-    
+
     append = boundingBox.append
 
     #countWidth = 0
@@ -297,48 +297,48 @@ def minimumBoundingBox(boundingBox_tuple):
         #The width  must  be at least the height of the tallest rectangle
         if width < widestBox :
             continue
-       
+
         #The height must  be at least the height of the tallest rectangle
         for height in possibleHeight:
             if height < heighestBox:
                 continue
-            
+
             #The area must be enough to contain all rectangles
             area = width * height
             if area < lowerArea:
                 continue
-            
+
             if area > upperArea:
                 break
 
             append([None, width, height, area])
-        
-    
-    
 
-    
+
+
+
+
     resultSorted = sorted(boundingBox, key=lambda tup:  tup[3])
     # resultSorted = sorted(boundingBox, key=lambda tup:  (abs(1 - tup[1]/tup[2]), tup[1]))
     # print(resultSorted)
     return resultSorted
 
-    
-    
+
+
 #Try to pack the bounding box into the candidate bounding boxes
 #Ranking = 0 position priority ordered by distance to origin (for optimal layout)
 #Ranking = 1 position priority ordered by y then x
 def pack(boundingBox_tuples, boundingBoxes, ranking):
     #Recursiev algorithm to find the minimal bounding box in term or arae
-    indexMin = 0 
+    indexMin = 0
     indexMax = len(boundingBoxes) - 1
     bestLayout = None
     bestBox = None
-    
+
 
     count = 0
-    
+
     for bestBox in boundingBoxes :
-        
+
         print("Treating : " + str(count+1) + "/" + str(len(boundingBoxes)))
         bestLayout = determineLayout(boundingBox_tuples, bestBox, ranking)
         if not bestLayout is None:
@@ -347,9 +347,9 @@ def pack(boundingBox_tuples, boundingBoxes, ranking):
         count = count + 1
 
     return bestLayout, bestBox
-    
+
 #Generate a layout relatively to a bounding box
-#Placement is organized from widest  
+#Placement is organized from widest
 def determineLayout(boundingBox_tuples, boundingBox, ranking):
     boundingBox_tuples = sorted(boundingBox_tuples, key=lambda tup: tup[1], reverse=True)
     #X,Y coordinates
@@ -359,10 +359,10 @@ def determineLayout(boundingBox_tuples, boundingBox, ranking):
     #Originate is lower left point
     placedRectangles = []
     #When a new placed rectangle generate a non-reflex vertex
-    #A supplementary vertice may be generated under it 
+    #A supplementary vertice may be generated under it
     # Either at y = 0 or at the first met box under it
     suppVertix = None
-    
+
     #For each boxes
     for boundingBoxToPlace in boundingBox_tuples :
         #A place is not found
@@ -395,23 +395,23 @@ def determineLayout(boundingBox_tuples, boundingBox, ranking):
         #If there is a supplementary vertex, we will use it
         if not suppVertix is None:
             possibleVertices.append(suppVertix)
-        
+
         possibleVertices.append([vertix[0] + boundingBoxToPlace[1], vertix[1]])
-        
+
         possibleVertices.append([vertix[0], vertix[1] + boundingBoxToPlace[2]])
-            
-        
+
+
         possibleVertices.append([vertix[0] + boundingBoxToPlace[1], vertix[1] + boundingBoxToPlace[2]])
-        
-   
+
+
         #Reordering vertices according to origin distance
         if (ranking == 1) :
             possibleVertices = sorted(possibleVertices, key=lambda x: x[1] * 1000 + x[0])
         else :
             possibleVertices = sorted(possibleVertices, key=lambda x: (x[1] * x[1] + x[0] * x[0]))
-    
-    
-    
+
+
+
     return placedRectangles
 
 
@@ -421,24 +421,24 @@ def  movingFeature(rectngle_tuple,  vectorLayer,  attributeClass, secondaryRanki
     #Initializing new layer
     vl = QgsVectorLayer("Polygon", outputLayerName, "memory")
     pr = vl.dataProvider()
-    
+
     #Update
     pr.addAttributes(fields)
     vl.updateFields()
-    
+
     features = []
-    
+
     for rectangle in rectngle_tuple:
         #The translation is encoding with X,Y
         x = rectangle[1]
         y = rectangle[2] + rectangle[4] /2
-         
+
         for feature in rectangle[0]:
             geometry = feature.geometry()
             geometry.translate(x,y)
             feature.setGeometry(geometry)
             features.append(feature)
-            
+
 
     pr.addFeatures(features)
     vl.commitChanges()
@@ -450,19 +450,19 @@ def  movingFeature(rectngle_tuple,  vectorLayer,  attributeClass, secondaryRanki
 #It requires a rectngle_tuple and the bounding box of the layout
 def extendRectangleTuple(rectngle_tuple, b):
     #Results are stored into the intial rectngle_tuple
-    
+
     #This is a discrete method
     widthStep = b[1]/1000.0;
-    
-    
+
+
     nbRectangle = len(rectngle_tuple)
     #Iteration on each rectangle
     for i in range(0, nbRectangle):
-        
+
         #We remove a current rectangle from the list
         currentRectangle = rectngle_tuple[i]
         rectngle_tuple.remove(currentRectangle)
-        
+
         #We store the initial width and the width after modifications
         initialWidth = currentRectangle[3]
         currentWidth = initialWidth
@@ -472,20 +472,20 @@ def extendRectangleTuple(rectngle_tuple, b):
             #We widthen the current rectangle
             currentRectangle = widthenRectangle(currentRectangle, widthStep);
             currentWidth = currentWidth + widthStep
-            
+
             #Does it stay into the initial bounding box ?
             if not checkIfIsBoundingBox(currentRectangle, b):
                 conditionCheck = False
                 break
-            
+
             #Does it intersects another rectangle from the list ?
             for placeRectangle in rectngle_tuple:
                 intersected = testIntersection(currentRectangle, placeRectangle)
-                
+
                 if intersected :
                     conditionCheck = False
                     break
-        
+
         #We went a step further we decrease the width
         currentRectangle  = widthenRectangle(currentRectangle, - widthStep)
         currentWidth = currentWidth - widthStep
@@ -506,23 +506,23 @@ def extendFeatureInRectangle(currentRectangle,currentWidth, initialWidth ):
         return currentRectangle;
     #We get the features inside a rectangle
     features = currentRectangle[0]
-    
+
     nbFeatures = len(features)
     #The x move for each featuer from a previous one
     deltaX = (currentWidth - initialWidth) / (nbFeatures+1)
-    
+
     #We applied a translation i * deltaX
     for i in range(0, nbFeatures):
         currentFeature = features[i]
         features.remove(currentFeature)
-        
+
         geometry = currentFeature.geometry()
         geometry.translate((i + 1) * deltaX,0)
         currentFeature.setGeometry(geometry)
-        
-            
+
+
         features.insert(i, currentFeature)
-        
+
     #We return the new rectangle
     return  (features,currentRectangle[1],currentRectangle[2],currentRectangle[3],currentRectangle[4]);
 
@@ -544,7 +544,7 @@ def combinaison(seq, k):
             j += 1
         if len(s)==k:
             p.append(s)
-        i += 1 
+        i += 1
     return p
 
 
@@ -555,7 +555,7 @@ def canPlaceRectangle(vertix, rectangle,placedRectangles):
         intersected = testIntersection(rectangleToTest, placeRectangle)
         if intersected :
             return None;
-        
+
     return rectangleToTest
 
 #Check if a rectangle is inside a bounding box
@@ -564,35 +564,35 @@ def checkIfIsBoundingBox(placedRectangle, boundingBox):
 
 #Test the intersection between two rectangles
 def testIntersection(r1,r2):
-    
+
     if ((r1[1] < (r2[1] + r2[3])) and (r2[1] < (r1[1]+r1[3])) and
      (r1[2] < (r2[2] + r2[4])) and (r2[2] < (r1[2]+r1[4]))):
            return True
-    return False   
+    return False
 
 #Eventually add a supplementary vertix in the cas of non-reflex vertex
 #If a box is added
 def supplementaryVertix(vertixIni, placedRectangles):
     if(vertixIni[1] == 0):
         return None
-    
+
     newY =  0;
     #We only keep the y with the highest value (if not above the rectangle)
     for rectangles in placedRectangles:
         if( (rectangles[1] < vertixIni[0]) and (rectangles[1] + rectangles[3] > vertixIni[0])):
             currentY = rectangles[2] + rectangles[4]
-            
+
             if(vertixIni[1] < currentY):
                 continue;
-            
+
             newY = max(newY, currentY)
-            
+
     #print("New y :" + str(newY))
     return [vertixIni[0], newY]
-    
 
-    
- 
+
+
+
 
 
 """
@@ -601,19 +601,19 @@ Transforming intermediate objects to VectorLayer
 
 def fromPlaceRectangleToVectorLayer(placedRectangle):
     features = []
-    
+
     fields = [QgsField("X", QVariant.Double),QgsField("Y", QVariant.Double), QgsField("width", QVariant.Double),QgsField("height", QVariant.Double)]
     vl = QgsVectorLayer("Polygon", "temp", "memory")
     pr = vl.dataProvider()
     vl.startEditing()
-    
+
     pr.addAttributes(fields)
     vl.updateFields()
-    
+
     for b in placedRectangle:
             feat = generateBoundingBox(b[1], b[2], b[3], b[4], fields)
             features.append(feat)
-            
+
     #print("Number of features :" + str(len(features)))
     pr.addFeatures(features)
     vl.commitChanges()
@@ -622,34 +622,34 @@ def fromPlaceRectangleToVectorLayer(placedRectangle):
 
 def fromBoundingBoxToVectorLayer(boundingBox):
     features = []
-    
+
     fields = [QgsField("width", QVariant.Double),QgsField("height", QVariant.Double)]
     vl = QgsVectorLayer("Polygon", "bob", "memory")
     pr = vl.dataProvider()
     vl.startEditing()
-    
+
     pr.addAttributes(fields)
     vl.updateFields()
-    
+
     for b in boundingBox:
             feat = generateBoundingBox(b[0], b[1], b[2])
             features.append(feat)
-            
+
     #print("Number of features :" + str(len(features)))
     pr.addFeatures(features)
     vl.commitChanges()
     return vl
 
-            
+
 def generateBoundingBox(x,y, width, height, fields):
-    gPolygon = QgsGeometry.fromPolygonXY([[QgsPointXY(x, y), QgsPointXY(x+ width, y), QgsPointXY(x + width, y + height), 
+    gPolygon = QgsGeometry.fromPolygonXY([[QgsPointXY(x, y), QgsPointXY(x+ width, y), QgsPointXY(x + width, y + height),
                                            QgsPointXY(x, y +height)]])
 
-    
+
     feat = QgsFeature()
     feat.setGeometry(gPolygon)
     feat.initAttributes(len(fields))
-    
+
     feat.setAttribute(0, width)
     feat.setAttribute(1, height)
     return feat;

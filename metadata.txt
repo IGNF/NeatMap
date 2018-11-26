@@ -1,7 +1,7 @@
-# This file contains metadata for your plugin. Since 
-# version 2.0 of QGIS this is the proper way to supply 
-# information about a plugin. The old method of 
-# embedding metadata in __init__.py will 
+# This file contains metadata for your plugin. Since
+# version 2.0 of QGIS this is the proper way to supply
+# information about a plugin. The old method of
+# embedding metadata in __init__.py will
 # is no longer supported since version 2.0.
 
 # This file should be included when you package your plugin.# Mandatory items:
@@ -9,15 +9,15 @@
 [general]
 name=NeatMap
 qgisMinimumVersion=3.0
-description=A simple QGIS python plugin for building tidy cities.
+description=A simple QGIS python plugin for building neat maps.
 version=1.0
 author=IGN/ENSG
-email=julien.perret@gmail.com; mickael.brasebin@ign.fr
+email=julien.perret@gmail.com; mickael.brasebin@gmail.com
 
-about=A QGIS python plugin for building organized cities (i.e for the classification and producing layout of polygonal features). Initially developped  by Mickaël Brasebin Julien Perret, Rose Matelier and Bruce Thomas at ENSG/IGNF.
+about=A QGIS python plugin for building organized maps (i.e for the classification and producing layout of polygonal features). Initially developped  by Mickaël Brasebin Julien Perret, Rose Matelier and Bruce Thomas at ENSG/IGNF.
 
-tracker=https://github.com/julienperret/TidyCity/issues
-repository=https://github.com/julienperret/TidyCity
+tracker=https://github.com/julienperret/NeatMap/issues
+repository=https://github.com/julienperret/NeatMap
 # End of mandatory metadata
 
 # Recommended items:
@@ -28,7 +28,7 @@ repository=https://github.com/julienperret/TidyCity
 # Tags are comma separated with spaces allowed
 tags=classification;layouts
 
-homepage=https://github.com/julienperret/TidyCity
+homepage=https://github.com/julienperret/NeatMap
 category=Vector
 icon=icon.png
 # experimental flag
@@ -36,4 +36,3 @@ experimental=True
 
 # deprecated flag (applies to the whole plugin, not just a single version)
 deprecated=False
-

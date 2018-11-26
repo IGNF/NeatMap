@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
- TidyCity
+ NeatMap
                                  A QGIS plugin
- A simple QGIS python plugin for building tidy cities.
+ A simple QGIS python plugin for building neat maps.
                               -------------------
         begin                : 2016-11-30
         git sha              : $Format:%H$
@@ -37,11 +37,11 @@ from .indicatorCalculation import *
 from .classification import *
 from .square_packing import *
 #GUI import
-from .tidy_city_dialog import TidyCityDialog
+from .neatmap_dialog import NeatMapDialog
 
 
 
-class TidyCity:
+class NeatMap:
     """QGIS Plugin Implementation."""
 
     def __init__(self, iface):
@@ -53,7 +53,7 @@ class TidyCity:
         :type iface: QgsInterface
         """
         print("Initialisation")
-        
+
 
         # Save reference to the QGIS interface
         self.iface = iface
@@ -64,7 +64,7 @@ class TidyCity:
         locale_path = os.path.join(
             self.plugin_dir,
             'i18n',
-            'TidyCity_{}.qm'.format(locale))
+            'NeatMap_{}.qm'.format(locale))
 
         if os.path.exists(locale_path):
             self.translator = QTranslator()
@@ -76,10 +76,10 @@ class TidyCity:
 
         # Declare instance attributes
         self.actions = []
-        self.menu = self.tr(u'&TidyCity')
+        self.menu = self.tr(u'&NeatMap')
         # TODO: We are going to let the user set this up in a future iteration
-        self.toolbar = self.iface.addToolBar(u'TidyCity')
-        self.toolbar.setObjectName(u'TidyCity')
+        self.toolbar = self.iface.addToolBar(u'NeatMap')
+        self.toolbar.setObjectName(u'NeatMap')
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -94,7 +94,7 @@ class TidyCity:
         :rtype: QString
         """
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
-        return QCoreApplication.translate('TidyCity', message)
+        return QCoreApplication.translate('NeatMap', message)
 
 
     def add_action(
@@ -148,7 +148,7 @@ class TidyCity:
         """
 
         # Create the dialog (after translation) and keep reference
-        self.dlg = TidyCityDialog()
+        self.dlg = NeatMapDialog()
 
         icon = QIcon(icon_path)
         action = QAction(icon, text, parent)
@@ -176,20 +176,20 @@ class TidyCity:
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
-        icon_path = ':/plugins/TidyCity/icon.png'
+        icon_path = ':/plugins/NeatMap/icon.png'
         self.add_action(
             icon_path,
-            text=self.tr(u'Build a tidy city'),
+            text=self.tr(u'Build a neat map'),
             callback=self.run,
             parent=self.iface.mainWindow())
 
-        
+
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
             self.iface.removePluginVectorMenu(
-                self.tr(u'&TidyCity'),
+                self.tr(u'&NeatMap'),
                 action)
             self.iface.removeToolBarIcon(action)
         # remove the toolbar
@@ -204,28 +204,28 @@ class TidyCity:
         self.prepareGUI()
         # show the dialog
         self.dlg.show()
-        
+
         # Run the dialog event loop
         result = self.dlg.exec_()
 
-        return 
+        return
 
 
-	
+
     """
     GUI Iniialization
     """
-    def prepareGUI(self):   
+    def prepareGUI(self):
         #Button to process calculation
         self.dlg.pushButtonCalculation.clicked.connect(self.processCalculation)
-        self.dlg.pushButtonClassification.clicked.connect(self.processClassification)  
-        self.dlg.pushButtonLayout.clicked.connect(self.processLayout)      
-        
+        self.dlg.pushButtonClassification.clicked.connect(self.processClassification)
+        self.dlg.pushButtonLayout.clicked.connect(self.processLayout)
+
         #DropDown are updated when dropdown layer are activated
         self.dlg.inputPolygonLayer.activated.connect(self.updatePolygonLayer)
         self.dlg.inputPolygonLayerClass.activated.connect(self.updatePolygonLayerClass)
         self.dlg.inputPolygonLayerLayout.activated.connect(self.updateLayoutLayer)
-        
+
         #Updating the list of available attributes
         scrollArea = self.dlg.scrollArea;
         scrollArea.setWidgetResizable(True)
@@ -235,13 +235,13 @@ class TidyCity:
         scrollArea.setWidget(inner)
         #Updating all the dropboxes
         self.updateDropBoxes()
-        
-        
+
+
     """
-    
+
     Refresh/updating interface
-    
-    """    
+
+    """
         #Update the dropboxes that contains the layer list
     def updateDropBoxes(self):
         """Update the  dropdowns with layers"""
@@ -251,99 +251,99 @@ class TidyCity:
         self.dlg.inputPolygonLayerClass.clear()
         self.dlg.inputPolygonLayerLayout.clear()
 
-        
+
         for layer in layers:
             self.dlg.inputPolygonLayer.addItem(layer.name(),layer)
             self.dlg.inputPolygonLayerClass.addItem(layer.name(),layer)
             self.dlg.inputPolygonLayerLayout.addItem(layer.name(),layer)
-        #Refresh the dropboxes that list attributes 
+        #Refresh the dropboxes that list attributes
         self.updatePolygonLayer()
         self.updatePolygonLayerClass()
         self.updateLayoutLayer()
-        
+
     """
-    
+
     Section 1
-    
-    """          
-        
-        
-         
+
+    """
+
+
+
     #Refresh the ID attribute list from indicator calculation step
-    def refreshAttributeDropBox(self):  
-        #Listing layers  
+    def refreshAttributeDropBox(self):
+        #Listing layers
         layers = QgsProject.instance().mapLayers().values()
-        self.dlg.intputIDChoice.clear()        
-        
+        self.dlg.intputIDChoice.clear()
+
         selectedInputLayerIndex = self.dlg.inputPolygonLayer.currentIndex()
-        
+
         if selectedInputLayerIndex > -1 :
-            #Getting the selected layer 
+            #Getting the selected layer
             selectedInputLayer = self.dlg.inputPolygonLayer.itemData(selectedInputLayerIndex)
-            
+
             count = selectedInputLayer.featureCount();
 
             for a in selectedInputLayer.fields():
                     self.dlg.intputIDChoice.addItem(a.displayName(),a)
- 
 
-     
-    #Action when layer from indicator calculation is refreshed    
+
+
+    #Action when layer from indicator calculation is refreshed
     def updatePolygonLayer(self):
          self.refreshAttributeDropBox()
-   
-        
+
+
     """
-    
+
     Section 2
-    
-    """          
+
+    """
     #Action when layer from classification is refreshed
     def updatePolygonLayerClass(self):
         self.refreshDropDownLayerPanel()
         self.refreshAttributeDropBoxClassif()
 
     #Refresh the ID attribute list from indicator calculation step
-    def refreshAttributeDropBoxClassif(self):  
-        #Listing layers  
+    def refreshAttributeDropBoxClassif(self):
+        #Listing layers
         layers = QgsProject.instance().mapLayers().values()
-        self.dlg.intputIDChoiceClassif.clear()        
-        
+        self.dlg.intputIDChoiceClassif.clear()
+
         selectedInputLayerIndex = self.dlg.inputPolygonLayerClass.currentIndex()
-        
+
         if selectedInputLayerIndex > -1 :
-            #Getting the selected layer 
+            #Getting the selected layer
             selectedInputLayer = self.dlg.inputPolygonLayerClass.itemData(selectedInputLayerIndex)
-            
+
             count = selectedInputLayer.featureCount();
 
             for a in selectedInputLayer.fields():
                     self.dlg.intputIDChoiceClassif.addItem(a.displayName(),a)
-                    
-    
-    
-    
 
-    # Refresh the panel with the checkbox list                
+
+
+
+
+    # Refresh the panel with the checkbox list
     def refreshDropDownLayerPanel(self):
         layout =  self.dlg.scrollArea.widget().layout()
         #Cleaning layout
-        
-        for i in reversed(range(layout.count())): 
+
+        for i in reversed(range(layout.count())):
             widgetToRemove = layout.itemAt( i ).widget()
             # remove it from the layout list
             layout.removeWidget( widgetToRemove )
             # remove it from the gui
             widgetToRemove.setParent( None )
-        
+
         layers = QgsProject.instance().mapLayers().values()
-        
+
         selectedInputLayerIndex = self.dlg.inputPolygonLayerClass.currentIndex()
-        
+
         if selectedInputLayerIndex > -1 :
-            #Getting the selected layer 
+            #Getting the selected layer
             selectedInputLayer = self.dlg.inputPolygonLayerClass.itemData(selectedInputLayerIndex)
-            
+
             count = selectedInputLayer.featureCount();
 
 
@@ -358,204 +358,204 @@ class TidyCity:
         # provide file name index and field's unique values
         fni = vectorLayer.fields().indexFromName(classAttNam)
         unique_values = vectorLayer.uniqueValues(fni)
-        
+
         # fill categories
         categories = []
         for unique_value in unique_values:
             # initialize the default symbol for this geometry type
             symbol =     QgsSymbol.defaultSymbol(vectorLayer.geometryType())
-        
+
             # configure a symbol layer
             layer_style = {}
             layer_style['color'] = '%d, %d, %d' % (randrange(0, 256), randrange(0, 256), randrange(0, 256))
             layer_style['outline'] = '#000000'
             symbol_layer = QgsSimpleFillSymbolLayer.create(layer_style)
-        
+
             # replace default symbol layer with the configured one
             if symbol_layer is not None:
                 symbol.changeSymbolLayer(0, symbol_layer)
-        
+
             # create renderer object
             category = QgsRendererCategory(unique_value, symbol, str(unique_value))
             # entry for the list of category items
             categories.append(category)
-        
+
         # create renderer object
         renderer = QgsCategorizedSymbolRenderer(classAttNam, categories)
-        
+
         # assign the created renderer to the layer
         if renderer is not None:
             vectorLayer.setRenderer(renderer)
-        
+
         vectorLayer.triggerRepaint()
-        
+
     """
-    
+
     Section 3
-    
-    """    
+
+    """
     def updateLayoutLayer(self):
         self.updateIDClassification()
         self.updateSecondaryRanking()
-    
-    
+
+
     def updateIDClassification(self):
         layers = QgsProject.instance().mapLayers().values()
-        self.dlg.classificationAttributeLayout.clear()        
-        
+        self.dlg.classificationAttributeLayout.clear()
+
         selectedInputLayerIndex = self.dlg.inputPolygonLayerLayout.currentIndex()
-        
+
         if selectedInputLayerIndex > -1 :
-            #Getting the selected layer 
+            #Getting the selected layer
             selectedInputLayer = self.dlg.inputPolygonLayerLayout.itemData(selectedInputLayerIndex)
-            
+
             count = selectedInputLayer.featureCount();
 
             for a in selectedInputLayer.fields():
                 if a.isNumeric():
                     self.dlg.classificationAttributeLayout.addItem(a.displayName(),a)
-        
-    def updateSecondaryRanking(self):    
+
+    def updateSecondaryRanking(self):
         layers = QgsProject.instance().mapLayers().values()
-        self.dlg.inputSecondaryAttributeLayout.clear()        
-        
+        self.dlg.inputSecondaryAttributeLayout.clear()
+
         selectedInputLayerIndex = self.dlg.inputPolygonLayerLayout.currentIndex()
-        
+
         if selectedInputLayerIndex > -1 :
-            #Getting the selected layer 
+            #Getting the selected layer
             selectedInputLayer = self.dlg.inputPolygonLayerLayout.itemData(selectedInputLayerIndex)
-            
+
             count = selectedInputLayer.featureCount();
 
             for a in selectedInputLayer.fields():
                 if a.isNumeric():
-                    self.dlg.inputSecondaryAttributeLayout.addItem(a.displayName(),a)            
+                    self.dlg.inputSecondaryAttributeLayout.addItem(a.displayName(),a)
 
     """
-    
-    
+
+
     Execution phase 1 : calculation
-    
-    """    
-    
+
+    """
+
     #Processing calculation when ok button from Indicator calculation is pressed
     def processCalculation(self):
         #Getting the polygonlayer
         selectedInputLayerIndex = self.dlg.inputPolygonLayer.currentIndex()
         selectedInputLayer = self.dlg.inputPolygonLayer.itemData(selectedInputLayerIndex)
-        QgsMessageLog.logMessage("Layer selected : " + selectedInputLayer.name(), "Tidy City", Qgis.Info)
-        layername = self.dlg.LineEditTemporaryLayerName.text()    
-        QgsMessageLog.logMessage("Calculating indicator on layer : " + layername, "Tidy City", Qgis.Info)
+        QgsMessageLog.logMessage("Layer selected : " + selectedInputLayer.name(), "Neat Map", Qgis.Info)
+        layername = self.dlg.LineEditTemporaryLayerName.text()
+        QgsMessageLog.logMessage("Calculating indicator on layer : " + layername, "Neat Map", Qgis.Info)
         intputIDChoiceIndex = self.dlg.intputIDChoice.currentIndex()
         intputIDChoiceValue = self.dlg.intputIDChoice.itemData(intputIDChoiceIndex).displayName()
-        QgsMessageLog.logMessage("ID value : " + intputIDChoiceValue, "Tidy City", Qgis.Info)     
+        QgsMessageLog.logMessage("ID value : " + intputIDChoiceValue, "Neat Map", Qgis.Info)
         copyAttribute = self.dlg.copyAtt.isChecked()
-        QgsMessageLog.logMessage("Copy attribute : " + str(copyAttribute), "Tidy City", Qgis.Info)          
-        QgsMessageLog.logMessage("Calculating indicator on layer : " + layername, "Tidy City", Qgis.Info)  
-                        
+        QgsMessageLog.logMessage("Copy attribute : " + str(copyAttribute), "Neat Map", Qgis.Info)
+        QgsMessageLog.logMessage("Calculating indicator on layer : " + layername, "TNeat Map", Qgis.Info)
+
         vlOut = calculate(layername, selectedInputLayer,intputIDChoiceValue, copyAttribute);
-        
-        QgsMessageLog.logMessage("Adding layer to map", "Tidy City", Qgis.Info)
+
+        QgsMessageLog.logMessage("Adding layer to map", "Neat Map", Qgis.Info)
         QgsProject.instance().addMapLayer(vlOut)
-        
+
          #Refresh after processing
-         
+
          #Updating all layers as a new layer is added
         self.updateDropBoxes()
-        
+
         #Selection of new layer in classificaion menue
         self.selectItem(self.dlg.inputPolygonLayerClass,vlOut.name())
-        
+
         #Updateing classificaion content
         self.updatePolygonLayerClass()
         self.selectItem(self.dlg.intputIDChoiceClassif, intputIDChoiceValue)
         self.selectItem(self.dlg.inputPolygonLayer,selectedInputLayer.name())
-    
-    
-    
+
+
+
     """
-    
-    
+
+
     Execution phase 2 : classification
-    
-    """    
-    
-    
+
+    """
+
+
     def processClassification(self):
         selectedInputLayerIndex = self.dlg.inputPolygonLayerClass.currentIndex()
         selectedInputLayer = self.dlg.inputPolygonLayerClass.itemData(selectedInputLayerIndex)
-        QgsMessageLog.logMessage("Layer selected : " + selectedInputLayer.name(), "Tidy City", Qgis.Info)
+        QgsMessageLog.logMessage("Layer selected : " + selectedInputLayer.name(), "Neat Map", Qgis.Info)
         attributes = self.listingCheckedAttributes()
-        QgsMessageLog.logMessage("Attributes selected : " + str(len(attributes)), "Tidy City", Qgis.Info)
-         
+        QgsMessageLog.logMessage("Attributes selected : " + str(len(attributes)), "Neat Map", Qgis.Info)
+
         strNumberOfClasses = self.dlg.classifNumberOfClasses.text()
         numberOfClasses = int(strNumberOfClasses)
-        
-        QgsMessageLog.logMessage("Number of classes : " + str(numberOfClasses), "Tidy City", Qgis.Info)
-        
-        layername = self.dlg.classLayerName.text()    
-        QgsMessageLog.logMessage("Calculating indicator on layer : " + layername, "Tidy City", Qgis.Info)
-        
+
+        QgsMessageLog.logMessage("Number of classes : " + str(numberOfClasses), "Neat Mapy", Qgis.Info)
+
+        layername = self.dlg.classLayerName.text()
+        QgsMessageLog.logMessage("Calculating indicator on layer : " + layername, "Neat Map", Qgis.Info)
+
         intputIDChoiceIndex = self.dlg.intputIDChoiceClassif.currentIndex()
         intputIDChoiceValue = self.dlg.intputIDChoiceClassif.itemData(intputIDChoiceIndex).displayName()
-        QgsMessageLog.logMessage("ID value : " + intputIDChoiceValue, "Tidy City", Qgis.Info)
-        
+        QgsMessageLog.logMessage("ID value : " + intputIDChoiceValue, "TNeat Map", Qgis.Info)
+
         copyAttribute = self.dlg.copyAtt.isChecked()
-        QgsMessageLog.logMessage("Copy attribute : " + str(copyAttribute), "Tidy City", Qgis.Info) 
-        
+        QgsMessageLog.logMessage("Copy attribute : " + str(copyAttribute), "Neat Map", Qgis.Info)
+
         attributeClass = self.dlg.lineEditAttClass.text()
-        
-        QgsMessageLog.logMessage("Attribute for classification: " + attributeClass, "Tidy City", Qgis.Info)               
-        
+
+        QgsMessageLog.logMessage("Attribute for classification: " + attributeClass, "Neat Map", Qgis.Info)
+
         layerClassified = kmeans(selectedInputLayer, attributes, numberOfClasses, layername, attributeClass, intputIDChoiceValue, copyAttribute)
-        QgsMessageLog.logMessage("Adding layer to map", "Tidy City", Qgis.Info)
+        QgsMessageLog.logMessage("Adding layer to map", "Neat Map", Qgis.Info)
         QgsProject.instance().addMapLayer(layerClassified)
         self.categorizedColor(layerClassified, attributeClass)
-        
+
         #Refresh after processing
-        
+
          #Updating all layers as a new layer is added
         self.updateDropBoxes()
-        
+
         #Selection of new layer in classificaion menue
         self.selectItem(self.dlg.inputPolygonLayerLayout,layerClassified.name())
-        
+
         #Updateing classificaion content
         self.updatePolygonLayerClass()
         self.updateLayoutLayer()
         self.selectItem(self.dlg.classificationAttributeLayout, attributeClass)
         self.selectItem(self.dlg.inputSecondaryAttributeLayout,"area")
-        
+
     """
 
     Execution phase 3 : layout
-    
-    """  
+
+    """
     def processLayout(self):
         selectedIndexMethod = self.dlg.comboBoxLayoutMethod.currentIndex()
-        
+
         copyAttribute = self.dlg.copyAtt.isChecked()
-        QgsMessageLog.logMessage("Copy attribute : " + str(copyAttribute), "Tidy City", Qgis.Info) 
-        
+        QgsMessageLog.logMessage("Copy attribute : " + str(copyAttribute), "Neat Map", Qgis.Info)
+
         selectedInputLayerIndex = self.dlg.inputPolygonLayerLayout.currentIndex()
-        selectedInputLayer = self.dlg.inputPolygonLayerLayout.itemData(selectedInputLayerIndex)        
-        QgsMessageLog.logMessage("Layer selected : " + selectedInputLayer.name(), "Tidy City", Qgis.Info)
-        
+        selectedInputLayer = self.dlg.inputPolygonLayerLayout.itemData(selectedInputLayerIndex)
+        QgsMessageLog.logMessage("Layer selected : " + selectedInputLayer.name(), "Neat Map", Qgis.Info)
+
         intputClassificationAttributeIndex = self.dlg.classificationAttributeLayout.currentIndex()
         intputClassificationAttribute = self.dlg.classificationAttributeLayout.itemData(intputClassificationAttributeIndex).displayName()
-        QgsMessageLog.logMessage("Classification attribute : " + intputClassificationAttribute, "Tidy City", Qgis.Info)
-        
+        QgsMessageLog.logMessage("Classification attribute : " + intputClassificationAttribute, "Neat Map", Qgis.Info)
+
         intputClassificationSecondaryAttributeIndex = self.dlg.inputSecondaryAttributeLayout.currentIndex()
         intputClassificationSecondaryAttribute = self.dlg.inputSecondaryAttributeLayout.itemData(intputClassificationSecondaryAttributeIndex).displayName()
-        QgsMessageLog.logMessage("Secondary classification attribute : " + intputClassificationSecondaryAttribute, "Tidy City", Qgis.Info)
-        
+        QgsMessageLog.logMessage("Secondary classification attribute : " + intputClassificationSecondaryAttribute, "Neat Map", Qgis.Info)
+
         layerName = self.dlg.inputLayerNameLayout.text()
-        QgsMessageLog.logMessage("Attribute for classification: " + layerName, "Tidy City", Qgis.Info)   
-        
-        
+        QgsMessageLog.logMessage("Attribute for classification: " + layerName, "Neat Map", Qgis.Info)
+
+
         copyAttribute = self.dlg.copyAtt.isChecked()
-        QgsMessageLog.logMessage("Copy attribute : " + str(copyAttribute), "Tidy City", Qgis.Info) 
-        
+        QgsMessageLog.logMessage("Copy attribute : " + str(copyAttribute), "Neat Map", Qgis.Info)
+
         newLayoutLayer = None;
         boundingBoxLayout = None;
         if selectedIndexMethod ==0 :
@@ -566,35 +566,31 @@ class TidyCity:
             newLayoutLayer, boundingBoxLayout =  fast_layout(selectedInputLayer, intputClassificationAttribute, intputClassificationSecondaryAttribute, layerName, copyAttribute)
         if not boundingBoxLayout is None:
             QgsProject.instance().addMapLayer(boundingBoxLayout)
-         
+
 
         QgsProject.instance().addMapLayer(newLayoutLayer)
         self.categorizedColor(newLayoutLayer, intputClassificationAttribute)
-        
 
-            
-    
-        
+
+
+
+
     """
-    
-    
+
+
     Util functions
-    
-    """  
+
+    """
 
     def selectItem(self, dialog, text):
         for i in range(0,dialog.count()):
             if text in dialog.itemText(i):
                 dialog.setCurrentIndex(i)
-    
+
     def listingCheckedAttributes(self):
         attributes = []
         layout =  self.dlg.scrollArea.widget().layout()
         for i in reversed(range(layout.count())):
             if  layout.itemAt(i).widget().isChecked():
                 attributes.append(layout.itemAt(i).widget().text())
-            #QgsMessageLog.logMessage("--WIDGET---", "Tidy City", Qgis.Info)
-            #QgsMessageLog.logMessage(""+str(type(layout.itemAt(i).widget())), "Tidy City", Qgis.Info)
         return attributes
-
-

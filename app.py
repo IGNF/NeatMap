@@ -11,9 +11,9 @@ sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 from qgis.core import *
 
 from PyQt5.QtCore import QVariant
-from TidyCity.indicatorCalculation import *
-from TidyCity.classification import *
-from TidyCity.square_packing import *
+from NeatMap.indicatorCalculation import *
+from NeatMap.classification import *
+from NeatMap.square_packing import *
 
 
 

@@ -1,7 +1,7 @@
 #/***************************************************************************
-# TidyCity
+# Neatmp
 #
-# A simple QGIS python plugin for building tidy cities.
+# A simple QGIS python plugin for building neat cities.
 #							 -------------------
 #		begin				: 2016-11-30
 #		git sha				: $Format:%H$
@@ -38,15 +38,15 @@ LOCALES =
 # translation
 SOURCES = \
 	__init__.py \
-	tidy_city.py tidy_city_dialog.py
+	neatmap.py neatmap_dialog.py
 
-PLUGINNAME = TidyCity
+PLUGINNAME = NeatMap
 
 PY_FILES = \
 	__init__.py \
-	tidy_city.py tidy_city_dialog.py
+	neatmap.py neatmap_dialog.py
 
-UI_FILES = tidy_city_dialog_base.ui
+UI_FILES = neatmap_dialog_base.ui
 
 EXTRAS = metadata.txt icon.png
 
