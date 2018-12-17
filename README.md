@@ -8,7 +8,7 @@ NeatMap is a plugin for [QGIS](https://www.qgis.org/fr/site/) that allows the pr
 
 The project is developed as an Open-Source library based on :
 - [QGIS API V3.0](https://www.qgis.org/fr/site/), for morphological operators and layout generation ;
-- [Scikit learn 0.19.1](http://scikit-learn.org/stable/index.html) :  for the classification.
+- [Scikit learn 0.19.1](http://scikit-learn.org/stable/index.html) :  for the classification. Normally, the installation of thie library is automatic but if it fails, please refer to the [installation guide](https://scikit-learn.org/stable/install.html). 
 
 
 ![Sample of result](../image_doc/doc_images/sample.png?raw=true)
