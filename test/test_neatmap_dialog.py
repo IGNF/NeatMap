@@ -16,7 +16,7 @@ import unittest
 
 from PyQt4.QtGui import QDialogButtonBox, QDialog
 
-from tidy_city_dialog import TidyCityDialog
+from neatmap_dialog import NeatMapDialog
 
 from utilities import get_qgis_app
 QGIS_APP = get_qgis_app()
@@ -27,7 +27,7 @@ class TidyCityDialogTest(unittest.TestCase):
 
     def setUp(self):
         """Runs before each test."""
-        self.dialog = TidyCityDialog(None)
+        self.dialog = NeatMapDialog(None)
 
     def tearDown(self):
         """Runs after each test."""

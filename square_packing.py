@@ -339,7 +339,7 @@ def pack(boundingBox_tuples, boundingBoxes, ranking):
 
     for bestBox in boundingBoxes :
 
-        print("Treating : " + str(count+1) + "/" + str(len(boundingBoxes)))
+        #print("Treating : " + str(count+1) + "/" + str(len(boundingBoxes)))
         bestLayout = determineLayout(boundingBox_tuples, bestBox, ranking)
         if not bestLayout is None:
             currentBox = boundingBoxes[count]

@@ -140,6 +140,14 @@ As the occupation of the layout is not optimal, we implemented an extension meth
 
 ![Application of the extension of the features](../image_doc/doc_images/extendMethod.png?raw=true)
 
+**Warning** : this method produces optimized results but is very time consuming, we do not advice to use this method when the number of class is greater than 15.
+
+### Simple method
+
+This method is similar than the previons one. The method is very fast but the results are less optimized in terms of layout area. The extent width is determined according to the widest class. Then the method is a greedy placement by decreasing width.
+
+A post-process phase is applied once all classes are placed and extend the  extent of the different classes until it is possible (i.e. it does not intersect an other class extent). Then the objects that belongs to this class are added and horizontally distributed in the class extent.
+
 Standalone use of the code
 ---------------------
 The code can be used as a standalone application, globally the code is splitted into several python files :
@@ -255,8 +263,8 @@ Furthermore, we are interested in every feedbacks about this library if you find
 
 Contact for feedbacks
 ---------------------
-[Mickaël Brasebin](http://recherche.ign.fr/labos/cogit/cv.php?nom=Brasebin) & [Julien Perret](http://recherche.ign.fr/labos/cogit/cv.php?prenom=Julien&nom=Perret)
-[COGIT Laboratory](http://recherche.ign.fr/labos/cogit/accueilCOGIT.php)
+[Mickaël Brasebin](https://mbrasebin.github.io) & [Julien Perret](http://recherche.ign.fr/labos/cogit/cv.php?prenom=Julien&nom=Perret)
+[LASTIG Laboratory](http://recherche.ign.fr/)
 
 Contributors
 ---------------------

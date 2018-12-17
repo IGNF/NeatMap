@@ -27,6 +27,7 @@ from random import randrange
 from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QVariant, Qt, pyqtSlot
 from PyQt5.QtGui import QIcon, QTransform
 from PyQt5.QtWidgets import QAction, QProgressBar, QCheckBox, QFrame, QVBoxLayout
+
 from .resources import *
 
 from qgis.core import *
@@ -38,6 +39,7 @@ from .classification import *
 from .square_packing import *
 #GUI import
 from .neatmap_dialog import NeatMapDialog
+from .neatmap_about_dialog import NeatMapAboutDialog
 
 
 
@@ -216,6 +218,9 @@ class NeatMap:
     GUI Iniialization
     """
     def prepareGUI(self):
+        #Button to load about Window
+        self.dlg.aboutButton.clicked.connect(self.clickAbout)
+
         #Button to process calculation
         self.dlg.pushButtonCalculation.clicked.connect(self.processCalculation)
         self.dlg.pushButtonClassification.clicked.connect(self.processClassification)
@@ -438,11 +443,17 @@ class NeatMap:
 
     """
 
+
     #Processing calculation when ok button from Indicator calculation is pressed
     def processCalculation(self):
         #Getting the polygonlayer
         selectedInputLayerIndex = self.dlg.inputPolygonLayer.currentIndex()
         selectedInputLayer = self.dlg.inputPolygonLayer.itemData(selectedInputLayerIndex)
+
+        if(selectedInputLayer is None) :
+            QgsMessageLog.logMessage("No selected layer")
+            return
+
         QgsMessageLog.logMessage("Layer selected : " + selectedInputLayer.name(), "Neat Map", Qgis.Info)
         layername = self.dlg.LineEditTemporaryLayerName.text()
         QgsMessageLog.logMessage("Calculating indicator on layer : " + layername, "Neat Map", Qgis.Info)
@@ -484,6 +495,12 @@ class NeatMap:
     def processClassification(self):
         selectedInputLayerIndex = self.dlg.inputPolygonLayerClass.currentIndex()
         selectedInputLayer = self.dlg.inputPolygonLayerClass.itemData(selectedInputLayerIndex)
+
+        if(selectedInputLayer is None) :
+            QgsMessageLog.logMessage("No selected layer")
+            return
+
+
         QgsMessageLog.logMessage("Layer selected : " + selectedInputLayer.name(), "Neat Map", Qgis.Info)
         attributes = self.listingCheckedAttributes()
         QgsMessageLog.logMessage("Attributes selected : " + str(len(attributes)), "Neat Map", Qgis.Info)
@@ -539,6 +556,12 @@ class NeatMap:
 
         selectedInputLayerIndex = self.dlg.inputPolygonLayerLayout.currentIndex()
         selectedInputLayer = self.dlg.inputPolygonLayerLayout.itemData(selectedInputLayerIndex)
+
+        if(selectedInputLayer is None) :
+            QgsMessageLog.logMessage("No selected layer")
+            return
+
+
         QgsMessageLog.logMessage("Layer selected : " + selectedInputLayer.name(), "Neat Map", Qgis.Info)
 
         intputClassificationAttributeIndex = self.dlg.classificationAttributeLayout.currentIndex()
@@ -572,8 +595,21 @@ class NeatMap:
         self.categorizedColor(newLayoutLayer, intputClassificationAttribute)
 
 
+    """
 
 
+    About windows
+
+    """
+
+    def clickAbout(self):
+        QgsMessageLog.logMessage("I am here")
+        # création d'une fenêtre avec QWidget dont on place la référence dans fen
+        fen = NeatMapAboutDialog()
+
+        # la fenêtre est rendue visible
+        fen.show()
+        fen.exec_()
 
     """
 
