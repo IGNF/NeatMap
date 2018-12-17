@@ -450,7 +450,7 @@ class NeatMap:
         selectedInputLayerIndex = self.dlg.inputPolygonLayer.currentIndex()
         selectedInputLayer = self.dlg.inputPolygonLayer.itemData(selectedInputLayerIndex)
 
-        if(selectedInputLayer is None) :
+        if selectedInputLayer is None :
             QgsMessageLog.logMessage("No selected layer")
             return
 
@@ -458,9 +458,15 @@ class NeatMap:
         layername = self.dlg.LineEditTemporaryLayerName.text()
         QgsMessageLog.logMessage("Calculating indicator on layer : " + layername, "Neat Map", Qgis.Info)
         intputIDChoiceIndex = self.dlg.intputIDChoice.currentIndex()
+
         intputIDChoiceValue = self.dlg.intputIDChoice.itemData(intputIDChoiceIndex).displayName()
+
+        if intputIDChoiceValue == -1:
+            QgsMessageLog.logMessage("No ID attribute chosen", "Neat Map", Qgis.Info)
+            return
         QgsMessageLog.logMessage("ID value : " + intputIDChoiceValue, "Neat Map", Qgis.Info)
         copyAttribute = self.dlg.copyAtt.isChecked()
+
         QgsMessageLog.logMessage("Copy attribute : " + str(copyAttribute), "Neat Map", Qgis.Info)
         QgsMessageLog.logMessage("Calculating indicator on layer : " + layername, "TNeat Map", Qgis.Info)
 
@@ -499,22 +505,35 @@ class NeatMap:
         if(selectedInputLayer is None) :
             QgsMessageLog.logMessage("No selected layer")
             return
-
-
         QgsMessageLog.logMessage("Layer selected : " + selectedInputLayer.name(), "Neat Map", Qgis.Info)
+
         attributes = self.listingCheckedAttributes()
-        QgsMessageLog.logMessage("Attributes selected : " + str(len(attributes)), "Neat Map", Qgis.Info)
+        nbAttributes =  str(len(attributes))
+        if nbAttributes == 0 :
+            QgsMessageLog.logMessage("No selected attributes", "Neat Map", Qgis.Info)
+            return
+        QgsMessageLog.logMessage("Attributes selected : " + nbAttributes, "Neat Map", Qgis.Info)
 
         strNumberOfClasses = self.dlg.classifNumberOfClasses.text()
         numberOfClasses = int(strNumberOfClasses)
 
+        if numberOfClasses < 1:
+            QgsMessageLog.logMessage("Not enough classes :" + numberOfClasses, "Neat Map", Qgis.Info)
+            return
         QgsMessageLog.logMessage("Number of classes : " + str(numberOfClasses), "Neat Mapy", Qgis.Info)
 
         layername = self.dlg.classLayerName.text()
         QgsMessageLog.logMessage("Calculating indicator on layer : " + layername, "Neat Map", Qgis.Info)
 
         intputIDChoiceIndex = self.dlg.intputIDChoiceClassif.currentIndex()
+
+
+
         intputIDChoiceValue = self.dlg.intputIDChoiceClassif.itemData(intputIDChoiceIndex).displayName()
+
+        if intputIDChoiceValue == -1:
+            QgsMessageLog.logMessage("No ID attribute chosen", "Neat Map", Qgis.Info)
+            return
         QgsMessageLog.logMessage("ID value : " + intputIDChoiceValue, "TNeat Map", Qgis.Info)
 
         copyAttribute = self.dlg.copyAtt.isChecked()
@@ -566,14 +585,24 @@ class NeatMap:
 
         intputClassificationAttributeIndex = self.dlg.classificationAttributeLayout.currentIndex()
         intputClassificationAttribute = self.dlg.classificationAttributeLayout.itemData(intputClassificationAttributeIndex).displayName()
+
+        if(intputClassificationAttribute is None) :
+            QgsMessageLog.logMessage("No attribute classification selected")
+            return
         QgsMessageLog.logMessage("Classification attribute : " + intputClassificationAttribute, "Neat Map", Qgis.Info)
 
         intputClassificationSecondaryAttributeIndex = self.dlg.inputSecondaryAttributeLayout.currentIndex()
         intputClassificationSecondaryAttribute = self.dlg.inputSecondaryAttributeLayout.itemData(intputClassificationSecondaryAttributeIndex).displayName()
+
+
+        if(intputClassificationSecondaryAttribute is None) :
+            QgsMessageLog.logMessage("No attribute second classification selected")
+            return
+
         QgsMessageLog.logMessage("Secondary classification attribute : " + intputClassificationSecondaryAttribute, "Neat Map", Qgis.Info)
 
         layerName = self.dlg.inputLayerNameLayout.text()
-        QgsMessageLog.logMessage("Attribute for classification: " + layerName, "Neat Map", Qgis.Info)
+        QgsMessageLog.logMessage("Out layer for classification: " + layerName, "Neat Map", Qgis.Info)
 
 
         copyAttribute = self.dlg.copyAtt.isChecked()
@@ -603,7 +632,6 @@ class NeatMap:
     """
 
     def clickAbout(self):
-        QgsMessageLog.logMessage("I am here")
         # création d'une fenêtre avec QWidget dont on place la référence dans fen
         fen = NeatMapAboutDialog()
 
