@@ -99,7 +99,7 @@
          <item>
           <widget class="QLabel" name="label_3">
            <property name="text">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Website&lt;/span&gt; (Documentation, tutorial, test data, code execution, issues) :&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/julienperret/NeatMap/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/julienperret/NeatMap&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Website&lt;/span&gt; (Documentation, tutorial, test data, code execution, issues) :&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/IGNF/NeatMap/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/IGNF/NeatMap&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="textFormat">
             <enum>Qt::RichText</enum>
