@@ -17,8 +17,8 @@ email=julien.perret@gmail.com; mickael.brasebin@gmail.com
 about=A QGIS python plugin for building organized maps (i.e for the classification and producing layout of polygonal features). Initially developped  by Mickaël Brasebin Julien Perret, Rose Matelier and Bruce Thomas at ENSG/IGNF. The project is developed as an Open-Source library based on QGIS API V3.0, for morphological operators and layout generation and Scikit learn 0.19.1 : for the classification.
 
 
-tracker=https://github.com/julienperret/NeatMap/issues
-repository=https://github.com/julienperret/NeatMap
+tracker=https://github.com/IGNF/NeatMap/issues
+repository=https://github.com/IGNF/NeatMap
 # End of mandatory metadata
 
 # Recommended items:
@@ -29,7 +29,7 @@ repository=https://github.com/julienperret/NeatMap
 # Tags are comma separated with spaces allowed
 tags=classification;layouts
 
-homepage=https://github.com/julienperret/NeatMap
+homepage=https://github.com/IGNF/NeatMap
 category=Vector
 icon=icon.png
 # experimental flag
