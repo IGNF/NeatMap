@@ -468,7 +468,7 @@ class NeatMap:
         copyAttribute = self.dlg.copyAtt.isChecked()
 
         QgsMessageLog.logMessage("Copy attribute : " + str(copyAttribute), "Neat Map", Qgis.Info)
-        QgsMessageLog.logMessage("Calculating indicator on layer : " + layername, "TNeat Map", Qgis.Info)
+        QgsMessageLog.logMessage("Calculating indicator on layer : " + layername, "Neat Map", Qgis.Info)
 
         vlOut = calculate(layername, selectedInputLayer,intputIDChoiceValue, copyAttribute);
 
