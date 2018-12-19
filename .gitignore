@@ -92,3 +92,6 @@ ENV/
 .pydevproject
 .settings/
 .idea
+
+#Result data
+data_test/*
