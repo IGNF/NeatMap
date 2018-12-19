@@ -3,19 +3,24 @@ from qgis.core import *
 
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 
 try:
-    import pip
+    from pip._internal import main
 except:
-    execfile(os.path.join(self.plugin_dir, get_pip.py))
-    import pip
+    plugin_dir=os.path.dirname(__file__)
+    getpipscript= os.path.join(plugin_dir, "get-pip.py")
+    import subprocess
+    subprocess.call("python3 get-pip.py --user", shell=True)
+    #exec(compile(open(getpipscript).read(), getpipscript, 'exec'))
+    from pip._internal import main
     # just in case the included version is old
-    pip.main(['install','--upgrade','pip'])
+    main(['install','--upgrade','--user','pip'])
 
 try:
     from sklearn import datasets
 except:
-    pip.main(['install','-U' , 'scikit-learn'])
+    main(['install','-U' ,'--user', 'scikit-learn'])
     
     
     
