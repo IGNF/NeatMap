@@ -17,8 +17,10 @@ from NeatMap.square_packing import *
 
 
 
-input_dir = "/home/mbrasebin/Documents/Donnees/Test/NeatMap/world/"
-output_dir = "/home/mbrasebin/Documents/Donnees/temp/"
+input_file = os.path.join(SCRIPT_DIR,'data_test/world.shp')
+output_dir =  os.path.join(SCRIPT_DIR,'data_test/')
+print(input_file)
+print(output_dir)
 
 fid_atribute = "fid"
 
@@ -33,7 +35,7 @@ qgs = QgsApplication([],GUIenabled=False)
 # load providers
 qgs.initQgis()
 
-layer_polygons = QgsVectorLayer(os.path.join(input_dir,'world.shp'), 'polygons', 'ogr')
+layer_polygons = QgsVectorLayer(input_file, 'polygons', 'ogr')
 
 #Export layout
 crs=QgsCoordinateReferenceSystem("epsg:-1")
