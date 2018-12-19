@@ -184,6 +184,8 @@ class NeatMap:
             text=self.tr(u'Build a neat map'),
             callback=self.run,
             parent=self.iface.mainWindow())
+        #Run method that performs all the real work
+        self.prepareGUI()
 
 
 
@@ -202,8 +204,7 @@ class NeatMap:
     """
 
     def run(self):
-        #Run method that performs all the real work
-        self.prepareGUI()
+
         # show the dialog
         self.dlg.show()
 
