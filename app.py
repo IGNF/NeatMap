@@ -8,6 +8,34 @@ PACKAGE_PARENT = '..'
 SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 
+from pathlib import Path
+
+# Chercher les chemins de QGIS sur Linux, Windows ou MacOS
+qgsRoot = None
+if sys.platform == 'linux':
+    for d in ['/usr', '/usr/local', '/opt/qgis']:
+        if Path(d + '/lib/qgis').exists():
+            qgsRoot = Path(d)
+            sys.path.append(str(qgsRoot/'share/qgis/python'))
+elif sys.platform == 'win32':
+    for d in Path('C:/Program Files').iterdir():
+        if 'QGIS 3' in str(d) or 'OSGeo4W64' in str(d):
+            qgsRoot = d
+    if not qgsRoot :
+        for d in Path('C:/').iterdir():
+            if 'OSGeo4W64' in str(d):
+                qgsRoot = d
+    if qgsRoot:
+        sys.path.append(str(qgsRoot/'apps/qgis/python'))
+elif sys.platform == 'darwin':
+    if Path('/Applications/QGIS.app').exists():
+        qgsRoot = Path('/Applications/QGIS.app')
+        sys.path.append(str(qgsRoot/'Contents/Resources/python/'))
+
+if not qgsRoot:
+    print('Unable to locate QGIS 3. Exiting now...')
+sys.exit()
+
 from qgis.core import *
 
 from PyQt5.QtCore import QVariant
