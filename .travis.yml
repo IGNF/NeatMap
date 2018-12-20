@@ -5,7 +5,7 @@ before_install:
   - sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key CAEB3DC3BDF7FB45
   - echo "deb https://qgis.org/ubuntugis xenial main" | sudo tee -a /etc/apt/sources.list
   - sudo apt update
-  - sudo apt install qgis
+  - sudo apt install qgis python-qgis
 
 language: python
 
