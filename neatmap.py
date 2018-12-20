@@ -204,7 +204,9 @@ class NeatMap:
     """
 
     def run(self):
-
+        #Updating all the dropboxes
+        self.updateDropBoxes()
+       
         # show the dialog
         self.dlg.show()
 
@@ -239,8 +241,7 @@ class NeatMap:
         inner = QFrame(scrollArea)
         inner.setLayout(QVBoxLayout())
         scrollArea.setWidget(inner)
-        #Updating all the dropboxes
-        self.updateDropBoxes()
+
 
 
     """
