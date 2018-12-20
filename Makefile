@@ -38,19 +38,19 @@ LOCALES =
 # translation
 SOURCES = \
 	__init__.py \
-	neatmap.py neatmap_dialog.py
+	neatmap.py neatmap_dialog.py neatmap_about_dialog.py app.py classification.py get-pip.py indicatorCalculation.py morpho.py square_packing.py
 
 PLUGINNAME = NeatMap
 
 PY_FILES = \
 	__init__.py \
-	neatmap.py neatmap_dialog.py
+	neatmap.py neatmap_dialog.py neatmap_about_dialog.py app.py classification.py get-pip.py indicatorCalculation.py morpho.py square_packing.py
 
-UI_FILES = neatmap_dialog_base.ui
+UI_FILES = neatmap_dialog_base.ui neatmap_about_dialog.ui
 
 EXTRAS = metadata.txt icon.png
 
-EXTRA_DIRS =
+EXTRA_DIRS = data_test
 
 COMPILED_RESOURCE_FILES = resources.py
 
