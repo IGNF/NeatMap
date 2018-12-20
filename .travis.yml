@@ -1,0 +1,16 @@
+dist: xenial
+
+before_install:
+  - sudo deb https://qgis.org/ubuntugis xenial main
+  - sudo apt update
+  - sudo apt install qgis
+
+language: python
+
+python:
+  - "3.4"
+  - "3.5"
+
+script:
+  - python3 app.py
+
