@@ -1,7 +1,7 @@
 dist: xenial
 
 before_install:
-  - sudo deb https://qgis.org/ubuntugis xenial main
+  - echo "deb https://qgis.org/ubuntugis xenial main" | sudo tee -a /etc/apt/sources.list
   - sudo apt update
   - sudo apt install qgis
 
