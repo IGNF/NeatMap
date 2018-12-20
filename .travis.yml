@@ -6,6 +6,7 @@ before_install:
   - echo "deb https://qgis.org/ubuntugis xenial main" | sudo tee -a /etc/apt/sources.list
   - sudo apt update
   - sudo apt install qgis python-qgis
+  - pip install --upgrade pip
 
 language: python
 
@@ -13,10 +14,8 @@ python:
   - "3.4"
   - "3.5"
 
-install:
-  - "export PATH=$PATH:/usr/share/qgis/python"
-  - "export PYTHONPATH=$PYTHONPATH:/usr/share/qgis/python"
-  - "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/share/qgis/lib"
+env:
+  - PATH=$PATH:/usr/share/qgis/python PYTHONPATH=$PYTHONPATH:/usr/share/qgis/python LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/share/qgis/lib
 
 script:
   - python app.py
