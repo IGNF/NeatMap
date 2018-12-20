@@ -14,8 +14,11 @@ python:
   - "3.4"
   - "3.5"
 
-env:
-  - PATH=$PATH:/usr/share/qgis/python PYTHONPATH=$PYTHONPATH:/usr/share/qgis/python LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/share/qgis/lib
+before_script:
+  - export QGIS_PREFIX_PATH=/usr
+  - export PYTHONPATH=${QGIS_PREFIX_PATH}/share/qgis/python/:${QGIS_PREFIX_PATH}/share/qgis/python/plugins:`pwd`
+  - echo "PYTHONPATH:" $PYTHONPATH
+  - export LD_LIBRARY_PATH=${QGIS_PREFIX_PATH}/lib
 
 script:
   - python app.py
