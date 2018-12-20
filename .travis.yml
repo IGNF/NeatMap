@@ -13,6 +13,9 @@ python:
   - "3.4"
   - "3.5"
 
+install:
+  - "export PYTHONPATH=$PYTHONPATH:/usr/share/qgis/python"
+
 script:
   - python3 app.py
 
