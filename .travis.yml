@@ -14,9 +14,9 @@ python:
   - "3.5"
 
 install:
+  - "export PATH=$PATH:/usr/share/qgis/python"
   - "export PYTHONPATH=$PYTHONPATH:/usr/share/qgis/python"
   - "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/share/qgis/lib"
 
 script:
-  - python3 app.py
-
+  - python app.py
