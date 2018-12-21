@@ -34,7 +34,7 @@ elif sys.platform == 'darwin':
 
 if not qgsRoot:
     print('Unable to locate QGIS 3. Exiting now...')
-sys.exit()
+    sys.exit()
 
 from qgis.core import *
 
