@@ -1,0 +1,10 @@
+pep8==1.4.6
+mock
+coverage
+coveralls
+psycopg2
+termcolor
+nose2
+numpy
+pyyaml
+future
