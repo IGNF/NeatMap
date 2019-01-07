@@ -16,13 +16,22 @@ except:
     from pip._internal import main
     # just in case the included version is old
     main(['install','--upgrade','--user','pip'])
+    
+    
+    
 
 try:
     from sklearn import datasets
 except:
+    from pip._internal import main
     main(['install','-U' ,'--user', 'scikit-learn'])
-    
-    
+
+# For windows users
+try:
+    from sklearn import datasets
+except:
+    import subprocess
+    subprocess.call(['easy_install', 'sklearn'])
     
 from sklearn import datasets
 from sklearn import preprocessing
