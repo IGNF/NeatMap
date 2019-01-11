@@ -17,7 +17,7 @@ python:
 before_script:
   - which qgis
   - export QGIS_PREFIX_PATH=/usr
-  - export PYTHONPATH=${QGIS_PREFIX_PATH}/share/qgis/python/:${QGIS_PREFIX_PATH}/share/qgis/python/plugins:`pwd`
+  - export PYTHONPATH=${QGIS_PREFIX_PATH}/bin/qgis/python/:${QGIS_PREFIX_PATH}/bin/qgis/python/plugins:`pwd`
   - echo "PYTHONPATH:" $PYTHONPATH
   - export LD_LIBRARY_PATH=${QGIS_PREFIX_PATH}/lib
 
