@@ -31,7 +31,7 @@ try:
     from sklearn import datasets
 except:
     import subprocess
-    subprocess.call(['easy_install', 'sklearn'])
+    subprocess.call(['easy_install', '-m', 'scikit-learn'])
     
 from sklearn import datasets
 from sklearn import preprocessing
