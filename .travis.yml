@@ -15,11 +15,9 @@ python:
   - "3.5"
 
 before_script:
-  - which qgis
-  - export QGIS_PREFIX_PATH=/usr
-  - export PYTHONPATH=${QGIS_PREFIX_PATH}/bin/qgis/python/:${QGIS_PREFIX_PATH}/bin/qgis/python/plugins:`pwd`
+  - export PYTHONPATH=/usr/share/qgis/python
   - echo "PYTHONPATH:" $PYTHONPATH
-  - export LD_LIBRARY_PATH=${QGIS_PREFIX_PATH}/lib
+  - export LD_LIBRARY_PATH=/usr/lib
 
 script:
   - python app.py
