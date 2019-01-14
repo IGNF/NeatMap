@@ -17,6 +17,7 @@ if sys.platform == 'linux':
         if Path(d + '/lib/qgis').exists():
             qgsRoot = Path(d)
             sys.path.append(str(qgsRoot/'share/qgis/python'))
+            print('libqgis : '+d + '/lib/qgis')
 elif sys.platform == 'win32':
     for d in Path('C:/Program Files').iterdir():
         if 'QGIS 3' in str(d) or 'OSGeo4W64' in str(d):
