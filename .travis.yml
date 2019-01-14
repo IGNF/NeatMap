@@ -16,8 +16,9 @@ python:
 
 before_script:
   - export PYTHONPATH=/usr/share/qgis/python
-  - echo "PYTHONPATH:" $PYTHONPATH
   - export LD_LIBRARY_PATH=/usr/lib
+  - export PATH=$PATH:$PYTHONPATH
+  - printenv
 
 script:
   - python app.py
