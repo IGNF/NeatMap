@@ -614,9 +614,9 @@ class NeatMap:
         boundingBoxLayout = None;
         if selectedIndexMethod ==0 :
             newLayoutLayer = naive_layout(selectedInputLayer, intputClassificationAttribute , intputClassificationSecondaryAttribute, layerName, copyAttribute)
+        elif  selectedIndexMethod == 2:
+            newLayoutLayer, boundingBoxLayout =  advanced_layout(selectedInputLayer, intputClassificationAttribute, intputClassificationSecondaryAttribute, layerName, copyAttribute)
         elif  selectedIndexMethod ==1 :
-          newLayoutLayer, boundingBoxLayout =  advanced_layout(selectedInputLayer, intputClassificationAttribute, intputClassificationSecondaryAttribute, layerName, copyAttribute)
-        elif  selectedIndexMethod ==2 :
             newLayoutLayer, boundingBoxLayout =  fast_layout(selectedInputLayer, intputClassificationAttribute, intputClassificationSecondaryAttribute, layerName, copyAttribute)
         if not boundingBoxLayout is None:
             QgsProject.instance().addMapLayer(boundingBoxLayout)
