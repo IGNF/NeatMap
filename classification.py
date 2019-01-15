@@ -32,6 +32,12 @@ try:
 except:
     import subprocess
     subprocess.call(['easy_install', '-m', 'scikit-learn'])
+
+try:
+    from sklearn import datasets
+except:
+    import subprocess
+    subprocess.call(['pip', 'install', '-U' ,'--user', 'scikit-learn'])
     
 from sklearn import datasets
 from sklearn import preprocessing
