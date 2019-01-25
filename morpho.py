@@ -25,7 +25,6 @@
 from PyQt5.QtGui import QTransform
 from qgis.core import QgsField, QgsGeometry, QgsPointXY, QgsRectangle,  QgsWkbTypes
 import math
-from statistics import *
 
 """
 SMBR computation.
