@@ -7,6 +7,8 @@ before_install:
   - sudo apt update
   - sudo apt install python-software-properties qgis python-qgis
   - pip install --upgrade pip
+  - sudo apt-get install python-support
+  - sudo update-python-modules -a
 
 language: python
 
