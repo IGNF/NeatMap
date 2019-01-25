@@ -3,6 +3,7 @@
 
 NeatMap
 ============
+[![Build Status](https://travis-ci.org/IGNF/NeatMap.svg?branch=master)](https://travis-ci.org/IGNF/NeatMap)
 
 NeatMap is a plugin for [QGIS](https://www.qgis.org/fr/site/) that allows the production of an "organized" set of polygon features according to their shapes. In order to proceed, three steps are necessary : 1/ morphological indicators calculation, 2/ classification of the polygon features using these indicators and 3/ generation of the disposition of the features.
 
