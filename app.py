@@ -157,5 +157,5 @@ print("Export layout")
 error = QgsVectorFileWriter.writeAsVectorFormat(otherLayout2, os.path.join(output_dir,"otherLayout2.shp"),"utf-8", crs, "ESRI Shapefile")
 
 qgs.exitQgis()
-sys.exixt()
+sys.exit()
 
