@@ -8,6 +8,7 @@ before_install:
   - sudo apt install python-software-properties qgis python-qgis
   - pip install --upgrade pip
   - sudo apt install python3-tk
+  - sudo apt install xvfb
   
 language: python
 
@@ -25,4 +26,4 @@ before_script:
 
 script:
   - which python
-  - python app.py
+  - xvfb-run -a python app.py
