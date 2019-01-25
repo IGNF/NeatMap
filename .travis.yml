@@ -24,4 +24,5 @@ before_script:
   - export LD_LIBRARY_PATH=${QGIS_PREFIX_PATH}/lib
 
 script:
+  - which python
   - python app.py
