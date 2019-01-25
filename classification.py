@@ -16,6 +16,7 @@ except:
     from pip._internal import main
     # just in case the included version is old
     main(['install','--upgrade','--user','pip'])
+    main(['freeze','--user','pip'])
     
     
     
@@ -32,6 +33,7 @@ try:
 except:
     import subprocess
     subprocess.call(['easy_install', '-m', 'scikit-learn'])
+    
 
 try:
     from sklearn import datasets
