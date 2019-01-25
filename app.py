@@ -7,7 +7,7 @@ import os
 PACKAGE_PARENT = '..'
 SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
-
+"""
 from pathlib import Path
 
 # Chercher les chemins de QGIS sur Linux, Windows ou MacOS
@@ -36,8 +36,7 @@ elif sys.platform == 'darwin':
 if not qgsRoot:
     print('Unable to locate QGIS 3. Exiting now...')
     sys.exit()
-
-print(sys.path)
+"""
 from qgis.core import *
 
 from PyQt5.QtCore import QVariant
@@ -158,4 +157,5 @@ print("Export layout")
 error = QgsVectorFileWriter.writeAsVectorFormat(otherLayout2, os.path.join(output_dir,"otherLayout2.shp"),"utf-8", crs, "ESRI Shapefile")
 
 qgs.exitQgis()
+sys.exixt()
 
