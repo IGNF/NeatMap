@@ -7,13 +7,11 @@ before_install:
   - sudo apt update
   - sudo apt install python-software-properties qgis python-qgis
   - pip install --upgrade pip
-  - sudo apt-get install python-support
-  - sudo update-python-modules -a
-
+  - sudo apt install python3-tk
+  
 language: python
 
 python:
-  - "3.4"
   - "3.5"
 virtualenv:
   system_site_packages: true
