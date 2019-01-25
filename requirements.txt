@@ -8,3 +8,4 @@ nose2
 numpy
 pyyaml
 future
+scikit-learn
