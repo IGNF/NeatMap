@@ -5,7 +5,5 @@ coveralls
 psycopg2
 termcolor
 nose2
-numpy
 pyyaml
 future
-scikit-learn
