@@ -38,7 +38,7 @@ Classification code only k-means for the moment
 """
 
 
-# Transforing classification to vector layer (layer : input layer, attributes : attribute used for classification, layerName ; nae of the layer, attributeClasse : attribute of the classification,  attributeID : name of attribute ID) , copyAtt indicate if other attributes are copied in output
+# Transforing classification to vector layer (layer : input layer, attributes : attribute used for classification, layerName ; name of the layer, attributeClasse : attribute of the classification,  attributeID : name of attribute ID) , copyAtt indicate if other attributes are copied in output
 def kmeans(layer, attributes, nbClasses, layerName, attributeClass, attributeID, copyAtt):  
     # Load in the `digits` data
     dataset = prepareDataset(layer, attributes)
