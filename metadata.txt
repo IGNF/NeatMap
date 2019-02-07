@@ -10,7 +10,7 @@
 name=NeatMap
 qgisMinimumVersion=3.0
 description=A simple QGIS python plugin for building neat maps.
-version=1.2
+version=1.3
 author=IGN-ENSG
 email=julien.perret@gmail.com; mickael.brasebin@gmail.com
 
