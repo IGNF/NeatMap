@@ -271,7 +271,7 @@ Contact for feedbacks
 
 Contributors
 ---------------------
-* Rose Matelier and Bruce Thomas from ENSG. Development of a very first version with static classification method and simple layout.
+* Rose Mathelier and Bruce Thomas from ENSG. Development of a very first version with static classification method and simple layout.
 
 
 Future developments
