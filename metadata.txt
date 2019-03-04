@@ -14,7 +14,7 @@ version=1.3
 author=IGN-ENSG
 email=julien.perret@gmail.com; mickael.brasebin@gmail.com
 
-about=A QGIS python plugin for building organized maps (i.e for the classification and producing layout of polygonal features). Initially developped  by Mickaël Brasebin Julien Perret, Rose Matelier and Bruce Thomas at ENSG/IGNF. The project is developed as an Open-Source library based on QGIS API V3.0, for morphological operators and layout generation and Scikit learn 0.19.1 : for the classification.
+about=A QGIS python plugin for building organized maps (i.e for the classification and producing layout of polygonal features). Initially developped  by Mickaël Brasebin Julien Perret, Rose Mathelier and Bruce Thomas at ENSG/IGNF. The project is developed as an Open-Source library based on QGIS API V3.0, for morphological operators and layout generation and Scikit learn 0.19.1 : for the classification.
 
 
 tracker=https://github.com/IGNF/NeatMap/issues
