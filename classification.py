@@ -15,15 +15,15 @@ except:
     #exec(compile(open(getpipscript).read(), getpipscript, 'exec'))
     from pip._internal import main
     # just in case the included version is old
-    main(['install','--upgrade','-U','pip3'])
-    main(['freeze','--user','pip3'])
+    main(['install','--upgrade','-U','pip'])
+    main(['freeze','--user','pip'])
 
 try:
     from sklearn import datasets
 except:
     import subprocess
     print("Try to install with subprocess")
-    subprocess.call(['pip3', 'install', '-U', 'scikit-learn'])
+    subprocess.call([sys.executable,'-m', 'pip',  'install', '--user', 'scikit-learn'])
     
 from sklearn import datasets
 from sklearn import preprocessing
