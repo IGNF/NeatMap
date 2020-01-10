@@ -21,6 +21,7 @@ except:
 try:
     from sklearn import datasets
 except:
+    import sys
     import subprocess
     print("Try to install with subprocess")
     subprocess.call([sys.executable,'-m', 'pip',  'install', '--user', 'scikit-learn'])
