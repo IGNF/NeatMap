@@ -3,6 +3,7 @@ dist: xenial
 before_install:
   - sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable -y
   - sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key CAEB3DC3BDF7FB45
+  - sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key 51F523511C7028C3
   - echo "deb https://qgis.org/ubuntugis xenial main" | sudo tee -a /etc/apt/sources.list
   - sudo apt update
   - sudo apt install python-software-properties qgis python-qgis
