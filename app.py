@@ -34,6 +34,7 @@ def run():
 	output_dir =  os.path.join(SCRIPT_DIR,'data_test/')
 	print(input_file)
 	print(output_dir)
+	
 
 	fid_atribute = "fid"
 
@@ -47,6 +48,12 @@ def run():
 	#Export layout
 	crs=QgsCoordinateReferenceSystem("epsg:-1")
 
+	saveOption = QgsVectorFileWriter.SaveVectorOptions()
+	saveOption.driverName = "ESRI ShapeFile"
+	saveOption.fileEncoding = "utf-8"
+	
+	transformContext = QgsProject.instance().transformContext()
+	
 	print("Calculate indicators")
 	#Step 1 : calculating indicator
 	# (layerName) => The name of the output layer
@@ -57,7 +64,7 @@ def run():
 
 	print("Export indicator shapefile")
 	#Export features with attributes
-	error = QgsVectorFileWriter.writeAsVectorFormat(layerOut, os.path.join(output_dir,"indicator.shp"),"utf-8", layerOut.crs(), "ESRI Shapefile")
+	error = QgsVectorFileWriter.writeAsVectorFormatV2(layerOut, os.path.join(output_dir,"indicator.shp"), transformContext, saveOption )
 
 
 	#Determining the attribute to use for the classification
@@ -78,7 +85,7 @@ def run():
 
 	print("Export classified layer")
 	#Export features with  classificatinoadvanced_layout
-	error = QgsVectorFileWriter.writeAsVectorFormat(layerClassified, os.path.join(output_dir,"classified.shp"),"utf-8", layerClassified.crs(), "ESRI Shapefile")
+	error = QgsVectorFileWriter.writeAsVectorFormatV2(layerClassified, os.path.join(output_dir,"classified.shp"), transformContext, saveOption )
 
 
 	#Step 3 ! Applying a naive layout
@@ -94,7 +101,7 @@ def run():
 	newLayoutLayer = naive_layout(layerClassified, classAttribute , attSecondary, layerName, True)
 	print("Export layout")
 	#Naive layout
-	error = QgsVectorFileWriter.writeAsVectorFormat(newLayoutLayer, os.path.join(output_dir,"naiveLayout.shp"),"utf-8", crs, "ESRI Shapefile")
+	error = QgsVectorFileWriter.writeAsVectorFormatV2(newLayoutLayer, os.path.join(output_dir,"naiveLayout.shp"), transformContext, saveOption )
 
 	print("Preparing layout2")
 	#Step 3 bis : other layout method (with the bounding boxes to debug the rectangle packing)
@@ -107,11 +114,11 @@ def run():
 
 	print("Export layout")
 	#Bounding boxes used for pack layout production
-	error = QgsVectorFileWriter.writeAsVectorFormat(layoutBoundingBox, os.path.join(output_dir,"boundingBox.shp"),"utf-8", crs, "ESRI Shapefile")
+	error = QgsVectorFileWriter.writeAsVectorFormatV2(layoutBoundingBox, os.path.join(output_dir,"boundingBox.shp"), transformContext, saveOption )
 
 	print("Export layout")
 	#Packed layout
-	error = QgsVectorFileWriter.writeAsVectorFormat(otherLayout, os.path.join(output_dir,"otherLayout.shp"),"utf-8", crs, "ESRI Shapefile")
+	error = QgsVectorFileWriter.writeAsVectorFormatV2(otherLayout, os.path.join(output_dir,"otherLayout.shp"), transformContext, saveOption )
 
 	print("Preparing layout3")
 	#Step 3 ter : other layout method, less optimal that in Step 3 bis. The widestbox is placed at first and the other one
@@ -125,11 +132,11 @@ def run():
 
 	print("Export layout")
 	#Bounding boxes used for fast layout production
-	error = QgsVectorFileWriter.writeAsVectorFormat(layoutBoundingBox2, os.path.join(output_dir,"boundingBox2.shp"),"utf-8", crs, "ESRI Shapefile")
+	error = QgsVectorFileWriter.writeAsVectorFormatV2(layoutBoundingBox2, os.path.join(output_dir,"boundingBox2.shp"), transformContext, saveOption )
 
 	print("Export layout")
 	#Packed layout
-	error = QgsVectorFileWriter.writeAsVectorFormat(otherLayout2, os.path.join(output_dir,"otherLayout2.shp"),"utf-8", crs, "ESRI Shapefile")
+	error = QgsVectorFileWriter.writeAsVectorFormatV2(otherLayout2, os.path.join(output_dir,"otherLayout2.shp"), transformContext, saveOption )
 
 
 run()

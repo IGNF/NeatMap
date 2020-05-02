@@ -4,27 +4,6 @@ from qgis.core import *
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-
-try:
-    from pip._internal import main
-except:
-    plugin_dir=os.path.dirname(__file__)
-    getpipscript= os.path.join(plugin_dir, "get-pip.py")
-    import subprocess
-    subprocess.call("python3 get-pip.py --user", shell=True)
-    #exec(compile(open(getpipscript).read(), getpipscript, 'exec'))
-    from pip._internal import main
-    # just in case the included version is old
-    main(['install','--upgrade','-U','pip'])
-    main(['freeze','--user','pip'])
-
-try:
-    from sklearn import datasets
-except:
-    import sys
-    import subprocess
-    print("Try to install with subprocess")
-    subprocess.call([sys.executable,'-m', 'pip',  'install', '--user', 'scikit-learn'])
     
 from sklearn import datasets
 from sklearn import preprocessing
@@ -32,7 +11,7 @@ from sklearn.cluster import KMeans
 from sklearn.datasets import make_blobs
 from sklearn.metrics import pairwise_distances_argmin
 
-
+from sklearn.utils import Bunch
 
 """
 Classification code only k-means for the moment
@@ -82,7 +61,7 @@ def prepareDataset(layer, attributes):
     # print(data)
     data = preprocessing.scale(data)
     # print(data)
-    dataset = datasets.base.Bunch(data=data, columns=columns)
+    dataset = Bunch(data=data, columns=columns)
     return dataset
 
 
