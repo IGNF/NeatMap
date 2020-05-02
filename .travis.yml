@@ -1,4 +1,4 @@
-dist: xenial
+dist: bionic
 
 before_install:
   - sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable -y
@@ -22,7 +22,7 @@ virtualenv:
 before_script:
   - which qgis
   - export QGIS_PREFIX_PATH=/usr
-  - export PYTHONPATH=/home/travis/.local/lib/python3.7/site-packages:/usr/lib/python3/dist-packages:${QGIS_PREFIX_PATH}/share/qgis/python/:${QGIS_PREFIX_PATH}/share/qgis/python/plugins:`pwd`
+  - export PYTHONPATH=/home/travis/.local/lib/python3/site-packages:/usr/lib/python3/dist-packages:${QGIS_PREFIX_PATH}/share/qgis/python/:${QGIS_PREFIX_PATH}/share/qgis/python/plugins:`pwd`
   - echo "PYTHONPATH:" $PYTHONPATH
   - export LD_LIBRARY_PATH=${QGIS_PREFIX_PATH}/lib
 
