@@ -3,7 +3,7 @@ dist: bionic
 before_install:
   - echo "deb https://qgis.org/ubuntu bionic main" | sudo tee -a /etc/apt/sources.list
   - sudo apt update
-  - sudo apt install qgis python3-qgis
+  - sudo apt install qgis
   - pip install --upgrade pip
   - sudo apt install python3-tk
   - sudo apt install xvfb
