@@ -6,7 +6,7 @@ before_install:
   - sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key 51F523511C7028C3
   - echo "deb https://qgis.org/ubuntugis xenial main" | sudo tee -a /etc/apt/sources.list
   - sudo apt update
-  - sudo apt install python-software-properties qgis python-qgis
+  - sudo apt install qgis python-qgis
   - pip install --upgrade pip
   - sudo apt install python3-tk
   - sudo apt install xvfb
