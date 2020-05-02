@@ -1,12 +1,9 @@
 dist: bionic
 
 before_install:
-  - sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable -y
-  - sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key CAEB3DC3BDF7FB45
-  - sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key 51F523511C7028C3
   - echo "deb https://qgis.org/ubuntu bionic main" | sudo tee -a /etc/apt/sources.list
   - sudo apt update
-  - sudo apt install qgis python-qgis
+  - sudo apt install qgis python3-qgis
   - pip install --upgrade pip
   - sudo apt install python3-tk
   - sudo apt install xvfb
