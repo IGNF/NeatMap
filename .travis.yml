@@ -9,6 +9,7 @@ before_install:
   - sudo apt install python3-tk
   - sudo apt install xvfb
   - pip install scikit-learn
+  - pip install pyqt5==5.4.2
  
 language: python
 
