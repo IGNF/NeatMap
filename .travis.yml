@@ -1,6 +1,7 @@
 dist: bionic
 
 before_install:
+  - sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key 51F523511C7028C3
   - echo "deb https://qgis.org/ubuntu bionic main" | sudo tee -a /etc/apt/sources.list
   - sudo apt update
   - sudo apt install qgis
